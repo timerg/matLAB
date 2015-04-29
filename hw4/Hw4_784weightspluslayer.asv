@@ -7,50 +7,38 @@ Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
 wi = ones(W^2,1);
-wj = ones(W^2,20).*0.2;
+wj = zeros(W^2,20).*0.2;
 wk = ones(20,10).*0.5;
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
-eta = 0.001;
+eta = 0.00001;
 %% read images and calculate the mean image for each digit
 for k = 0:0;
 for n = 0:9;
-    d = zeros(10,1);
-%      for c1 = Ntrain:799;
-%         fname1 = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c1);
-%         A = imread(fname1);
-%         Ad = double(A);
-%         d = d+(sum(Ad)./W./255)';
-%         
-%      end
-%         dforb = sum(d./(28*100));
-    d(n+1) = 100;
+    d = zeros(1,10);
+    d(n+1) = 1;
     
     for c = [0:(k*100-1),(k*100+100):(Ntrain+100)];
         fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
         B = double(imread(fname));
         xj = reshape(B./255,784,1);
-%         d = d + (sum(B))';
 
-        
         yj = xj'*wj;%wj':1x20
         xk = 1./(1.+exp(-yj));  %1x20
         yk = xk*wk;% 1x10;
-        err = d-yk'
-%         err = d-yj';  % every one
-%         delta = (err.*xj.*(1.-xj)'*wj(:,n+1)
-%         delta =(xj.*(1.-xj))'*wj*err;   %every one
-%         wi = wi +eta*delta.*xi;
-%         wj = wj + eta*xj*err';   %every one
-%         wk(:,n+1) = wk(:,n+1) + eta*err.*xk';
-        wk = wk+eta.*xk'*err;
-%         delta = err.*xk.*(1-xk).*wk(:,n+1)';
-        delta = err*wk'.*xk.*(1-xk)';
-        wj = wj+eta.*xj*delta;
-%         yj(n+1) = 0;
-%         [va,n2] = max(yj);
-%         errn = 0.5-yj(n2)';
-%         wj(:,n2) = wj(:,n2) + eta*errn.*xj;
+        err = d-yk;
+        
+        %%% change all
+%         delta = xk.*(1-xk)*wk*diag(err);
+%         wj = wj+eta.*xj*delta;
+%         wk = wk+eta.*xk'*err;
+        
+        %%% change once a time
+        delta = err(n+1)*wk(:,n+1).*xk'.*(1.-xk');
+        wj = wj + eta.*xj*delta';
+        wk(:,n+1) = wk(:,n+1) + eta*err(:,n+1).*xk';
+        
+        
 
     end
 %       Amean(:,n+1) = reshape(wj(:,n+1).*255*100,W^2,1);
