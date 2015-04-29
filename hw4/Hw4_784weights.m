@@ -3,7 +3,7 @@
 
 clear all; close all;
 
-Ntrain = 699; %800 pictures seperate into two parts
+Ntrain = 599; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
 wi = ones(W^2,1);
@@ -12,7 +12,7 @@ wj = ones(W^2,10).*0.5;
 Amean = ones(W^2,10);
 eta = 0.0001;
 %% read images and calculate the mean image for each digit
-for k = 0:7;
+for k = 0:0;
 for n = 0:9;
     d = zeros(10,1);
 %      for c1 = Ntrain:799;
@@ -54,14 +54,14 @@ for n = 0:9;
 
 end
     
-
+end
 
 
 %% testing
 accuracy = zeros(1,10);
 confusion = zeros(10,10);
 for CL = 1:10
-    for c = k*100:k*100+99
+    for c = 700:799
         dist = zeros(1,10);
         fname = sprintf('digit_%1d_%03d.bmp', CL-1, c);
         A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fname]));
@@ -72,4 +72,3 @@ for CL = 1:10
 end
 fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion))/sum(sum(confusion)));
 
-end
