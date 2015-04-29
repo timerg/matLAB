@@ -6,12 +6,11 @@ clear all; close all;
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
-wi = ones(W^2,1);
-wj = rand(W^2,20).*0.2;
+wj = rand(W^2,20).*0.1;
 wk = rand(20,10).*0.5;
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
-eta = 0.01;
+eta = 0.1;
 %% read images and calculate the mean image for each digit
 for ll = 0:2
     for k = 0;
@@ -43,7 +42,7 @@ for ll = 0:2
         end
     end
 end
-        for n = 0:0; 
+        for n = 0:1; 
             ww = wj*wk;
             Amean(:,n+1) = reshape(ww(:,n+1).*255*100,W^2,1);
             figure(1); subplot(3,4,n+1); 
@@ -52,12 +51,13 @@ end
 %% testing
 accuracy = zeros(1,10);
 confusion = zeros(10,10);
-for CL = 1:1
+for CL = 1:10
     for c = 700:799
         dist = zeros(1,10);
         fname = sprintf('digit_%1d_%03d.bmp', CL-1, c);
         A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fname]))./255;
-        dist = (ones(1,10)-reshape(A,784,1)'*wj*wk);
+        Fin_val = reshape(A,784,1)'*wj*wk
+        dist = (ones(1,10)*100-reshape(A,784,1)'*wj*wk);
         [y,indmin] = min(dist);
         confusion(CL,indmin) = confusion(CL,indmin)+1;
     end
