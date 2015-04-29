@@ -10,26 +10,33 @@ sp = 2
 wi = zeros(W,10);
 wj = zeros(W,10);
 
-eta = 0.001;
+eta = 0.01;
 %% read images and calculate the mean image for each digit
-for k = 0:0;
-    for n = 0:9;
+for k = 0:7840;
+%     for n = 0:9;
+        n = ceil(rand*10)-1
+        c = ceil(rand*0.7*1000)-1
         d = zeros(10,1);  
         d(n+1) =1 
-        for c = [0:(k*100-1),(k*100+100):(Ntrain+101)];
+%         for c = [0:(k*100-1),(k*100+100):(Ntrain+101)];
             fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
             B = double(imread(fname));
             xic = (sum(B)./(255*W))';
             xir = (sum(B')./(255*W))';
             yi = (xic'*wi)';
             yj = (xir'*wj)';
-            errc = 1-yi(n+1);
-            errr = 1-yj(n+1);
-            wi(:,n+1) = wi(:,n+1)+eta.*xic.*errc;
-            wj(:,n+1) = wj(:,n+1)+eta.*xir.*errr;   
+%             errc =d(n+1)'-yi(n+1);
+%             errr =d(n+1)'-yj(n+1);
+%             wi(:,n+1) = wi(:,n+1)+eta.*xic.*errc;
+%             wj(:,n+1) = wj(:,n+1)+eta.*xir.*errr;   
+            errc =d'-yi';
+            errr =d'-yj';
+            wi = wi+eta.*xic*errc;
+            wj = wj+eta.*xir*errr;   
+            
         end
-    end
-end
+%     end
+% end
 
 
 

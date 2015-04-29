@@ -42,8 +42,8 @@ for ll = 0:Ntrain*20
 
                 wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
                 end
-%             end
-%         end
+            end
+        end
     end
 end
         for n = 0:9; 

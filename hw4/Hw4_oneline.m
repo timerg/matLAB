@@ -60,21 +60,21 @@ for CL_fact = 1:10
 end
 fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion))/sum(sum(confusion)));
 %% testing 2
-C = zeros(W,W,10);
-for n = 0:9
-end
-confusion2 = zeros(10,10);
-for CL_fact = 1:10
-    for c = 1:Ntest
-        dist2 = zeros(1,10);
-        fname = sprintf('digit_%1d_%03d.bmp', CL_fact-1, c+Ntrain);
-        A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fname]));
-        for tt = 1:10
-            dist2(:,tt) =sum(sum((A*diag(wi(:,tt)))'*diag(wj(:,tt))));
-        end
-        
-        [y,indmin2] = max(dist2);
-        confusion2(CL_fact,indmin) = confusion2(CL_fact,indmin)+1;
-    end
-end
-fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion2))/sum(sum(confusion2)));
+% C = zeros(W,W,10);
+% for n = 0:9
+% end
+% confusion2 = zeros(10,10);
+% for CL_fact = 1:10
+%     for c = 1:Ntest
+%         dist2 = zeros(1,10);
+%         fname = sprintf('digit_%1d_%03d.bmp', CL_fact-1, c+Ntrain);
+%         A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fname]));
+%         for tt = 1:10
+%             dist2(:,tt) =sum(sum((A*diag(wi(:,tt)))'*diag(wj(:,tt))));
+%         end
+%         
+%         [y,indmin2] = max(dist2);
+%         confusion2(CL_fact,indmin) = confusion2(CL_fact,indmin)+1;
+%     end
+% end
+% fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion2))/sum(sum(confusion2)));
