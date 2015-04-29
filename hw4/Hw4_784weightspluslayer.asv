@@ -10,9 +10,10 @@ wj = roundn(rand(W^2,50),-1);
 wk = roundn(rand(50,10),-1);
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
-eta = 0.001;
+etak = 0.01;
+etaj = 0.01
 %% read images and calculate the mean image for each digit
-for ll = 0:Ntrain*
+for ll = 0:Ntrain*20
     for k = 0;
 %         for n = 1:1;
             
@@ -26,22 +27,21 @@ for ll = 0:Ntrain*
                 B = double(imread(fname));
                 xj = reshape(B./255,784,1);
 
-                yj = xj'*wj;%wj':1x20
+                yj = xj'*wj./784;%wj':1x20
                 xk = 1./(1.+exp(-yj));  %1x20
-                yk = xk*wk;% 1x10;
+                yk = xk*wk./50;% 1x10;
                 err = d-yk
 
                 %%% change all
                 
                 for nn = 0:9;
                 delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
-                wj = wj + eta.*xj*delta';
+                wj = wj + etaj.*xj*delta';
 
                 %%% change once a time
 
-                wk(:,nn+1) = wk(:,nn+1) + eta*err(:,nn+1).*xk';
+                wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
                 end
-
 %             end
 %         end
     end
@@ -59,8 +59,8 @@ Fin_val = zeros(100,10)
 for CL = 1:10
     for c = 700:799
         dist = zeros(1,10);
-        fname = sprintf('digit_%1d_%03d.bmp', CL-1, c);
-        A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fname]))./255;
+        fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
+        A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fnamet]))./255;
         dist = (reshape(A,784,1)'*wj*wk);
         [y,indmin] = max(dist);
         confusion(CL,indmin) = confusion(CL,indmin)+1;
