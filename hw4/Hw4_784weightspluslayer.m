@@ -6,23 +6,23 @@ clear all; close all;
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
-wj = roundn(rand(W^2,20),-1);
+wj = roundn(rand(W^2,20)*0.01,-0);
 wk = roundn(rand(20,10),-1);
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
 etak = 0.01;
-etaj = 0.01
+etaj = 0.01;
 %% read images and calculate the mean image for each digit
 for ll = 0:Ntrain*20
     for k = 0;
-%         for n = 1:1;
+        for n = 1:1;
             
-        n = ceil(rand*10)-1
-        c = ceil(rand*0.7*1000)-1
+%         n = ceil(rand*10)-1
+%         c = ceil(rand*0.7*1000)-1
             d = zeros(1,10);
             d(n+1) = 0.5
 
-%             for c = [0:(k*100-1),(k*100+100):(Ntrain+100)];
+            for c = [0:(k*100-1),(k*100+100):(Ntrain+100)];
                 fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
                 B = double(imread(fname));
                 xj = reshape(B./255,784,1);
