@@ -6,9 +6,21 @@ clear all; close all;
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
-wj = roundn(rand(W^2,20),-2);
-wk = roundn(rand(20,10),-2);
-% wj_all = zeros(W,10)
+
+use_importweight = 0;
+if use_importweight==0
+    wj = roundn(rand(W^2,20).*0.2,-3);
+    wk = roundn(rand(20,10),-3);
+    wk_ini = wk;
+    wj_ini = wj;
+elseif use_importweight == 1,
+    wj_ini = importdata('C:\Users\timer\Documents\GitHub\matlab\hw4\wj_ini.mat')
+    wk_ini = importdata('C:\Users\timer\Documents\GitHub\matlab\hw4\wk_ini.mat')
+    wj = roundn(wj_ini,-3);
+    wk = roundn(wk_ini,-3);
+else
+    error
+end
 Amean = ones(W^2,10);
 etak = 0.01;
 etaj = 1;
