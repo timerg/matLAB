@@ -6,12 +6,12 @@ clear all; close all;
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
-wj = roundn(rand(W^2,20)*0.01,-2);
-wk = roundn(rand(20,10)*0.01,-2);
+wj = roundn(rand(W^2,20),-2);
+wk = roundn(rand(20,10),-2);
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
 etak = 0.01;
-etaj = 0.01;
+etaj = 10;
 %% read images and calculate the mean image for each digit
 for ll = 0:Ntrain*20
     % for k = 0;
@@ -35,14 +35,9 @@ for ll = 0:Ntrain*20
 %%% change all
 
                 for nn = 0:9;
-                    % if err(nn+1)< 0.1;
                         delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
                         wj = wj + etaj.*xj*delta';
                         wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
-                    % else
-                    %     wj = wj;
-                    %     wk = wk;
-                    % end
                 end
             % end
         % end
