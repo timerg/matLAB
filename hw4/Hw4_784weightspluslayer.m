@@ -11,9 +11,9 @@ wk = roundn(rand(20,10),-2);
 % wj_all = zeros(W,10)
 Amean = ones(W^2,10);
 etak = 0.01;
-etaj = 10;
+etaj = 1;
 %% read images and calculate the mean image for each digit
-for ll = 0:Ntrain*20
+for ll = 0:Ntrain*50
     % for k = 0;
         % for n = 1:1;
         ll = ll
@@ -35,9 +35,9 @@ for ll = 0:Ntrain*20
 %%% change all
 
                 for nn = 0:9;
-                        delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
-                        wj = wj + etaj.*xj*delta';
-                        wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
+                    delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
+                    wj = wj + etaj.*xj*delta';
+                    wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
                 end
             % end
         % end
@@ -50,7 +50,7 @@ for ll = 0:Ntrain*20
 end
         for n = 0:9;
             ww = wj*wk;
-            Amean(:,n+1) = reshape(ww(:,n+1).*255*100,W^2,1);
+            Amean(:,n+1) = reshape(ww(:,n+1).*255/10,W^2,1);
             figure(1); subplot(3,4,n+1);
             imshow(reshape(Amean(:,n+1),W,W),[0 255])
         end
