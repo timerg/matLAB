@@ -1,13 +1,13 @@
 
 
 
-clear all; close all;
+% clear all; close all;
 
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
 
-use_importweight = 0;
+use_importweight = 3;
 if use_importweight==0
     wj = roundn(rand(W^2,20).*0.2,-3);
     wk = roundn(rand(20,10),-3);
@@ -18,6 +18,9 @@ elseif use_importweight == 1,
     wk_ini = importdata('C:\Users\timer\Documents\GitHub\matlab\hw4\wk_ini.mat')
     wj = roundn(wj_ini,-3);
     wk = roundn(wk_ini,-3);
+elseif use_importweight == 2,
+    wj = roundn(wj_ini.*0.1,-3);
+    wk = wk_ini;
 else
     error
 end
