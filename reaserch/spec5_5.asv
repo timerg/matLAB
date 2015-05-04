@@ -1,0 +1,69 @@
+clear all
+% wire_normal = ['L2-1','L2-3','L2-4','L2-6','L2-7','L2-8','L2-12'];
+% wire_abnormal = ['L2-2';'L2-9';'L2-10'];
+Vgs = [1.40E+00,1.60E+00,1.80E+00,2.00E+00,2.20E+00,2.40E+00,2.60E+00,2.80E+00,3.00E+00];
+mean = 1
+devi = 2
+V = size(Vgs,2);
+    onepr = [-4.14E-12	3.99E-11	7.03E-10	1.04E-08	7.08E-08	2.42E-07	5.59E-07	1.02E-06	1.56E-06;
+            5.95E-13	7.85E-12	1.57E-10	1.40E-09	6.80E-09	1.25E-08	2.15E-08	3.04E-08	2.65E-08];
+    tenpr = [-8.33E-12	-1.75E-12	6.50E-11	8.74E-10	1.06E-08	6.33E-08	2.15E-07	5.03E-07	9.30E-07;
+            3.93E-13	1.24E-12	1.70E-11	2.38E-10	2.12E-09	7.67E-09	1.69E-08	2.68E-08	4.48E-08];
+    onenr = [-9.21E-12	-4.13E-12	5.31E-11	7.17E-10	8.86E-09	5.69E-08	2.03E-07	4.64E-07	7.87E-07;
+             5.05E-13	8.39E-14	6.25E-12	2.91E-11	4.20E-10	1.86E-09	5.03E-09	1.16E-08	1.97E-08];
+figure(1);
+plot(Vgs,onepr(1,:),'r-',Vgs,tenpr(1,:),'g-',Vgs,onenr(1,:),'b-');
+   
+%%  plot      
+tolerance_1pdown = onepr(mean,:)-onepr(devi,:)-(tenpr(mean,:)+tenpr(devi,:));
+tolerance_1pdown_per = tolerance_1pdown./onepr(mean,:)
+tolerance_tenprpdown = (mean,:)-onepr(devi,:)-(tenpr(mean,:)+tenpr(devi,:));
+tolerance_tenprdown_per = tolerance_1pdown./onepr(mean,:)tolerance_tenprpdown = (mean,:)-onepr(devi,:)-(tenpr(mean,:)+tenpr(devi,:));
+tolerance_tenprdown_per = tolerance_1pdown./onepr(mean,:)
+%% test
+for iii=1:V
+     if  onefr(mean,iii)-tenpr(mean,ii)>0;
+        a=1
+     else
+        a=0
+     end
+     if  tenpr(mean,iii)-onenr(mean,ii)>0;
+         b=3
+     else
+         b=0
+     end
+end 
+        tolerance_vgs(ii) = tolerance;
+        tolerance_percentagevgs(ii) = tolerance_percentage;;
+        a_l(ii)=a;
+   
+    
+
+   tolernace_all(iii,:) = tolerance_vgs;
+   tolerance_percentageall(iii,:) = tolerance_percentagevgs;
+   
+   a_all(iii,:) = a_l
+
+Y = Vgs;
+X = linspace(1,L,L);
+Z = tolernace_all;
+Z2 = tolerance_percentageall
+
+noisemin = min (Z')
+absnoisemin = min((abs(Z')))
+
+
+figure(1);
+mesh(X,Y,Z); xlabel('L2-X');ylabel('Vgs');zlabel('A');
+set(gca,'zlim',[0 0.5E-7]);
+figure(2);
+mesh(X,Y,Z2); xlabel('L2-X');ylabel('Vgs');zlabel('%');
+% set(gca,'zlim',[0 0.5E-7])
+figure(3);
+subplot(231);plot(X,Z(8,:));xlabel('vgs=2.8');
+subplot(232);plot(X,Z(9,:));xlabel('vgs=3');
+subplot(233);plot(X,Z(7,:));xlabel('vgs=2.6');
+subplot(234);plot(X,Z(6,:));xlabel('vgs=2.4');
+subplot(235);plot(X,Z(5,:));xlabel('vgs=2.2');
+
+

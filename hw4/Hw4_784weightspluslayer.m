@@ -1,16 +1,17 @@
 
 
 
-% clear all; close all;
+clear all; close all;
 
 Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
 
-use_importweight = 3;
-if use_importweight==0
-    wj = roundn(rand(W^2,20).*0.2,-3);
-    wk = roundn(rand(20,10),-3);
+use_importweight = 0;
+msg = 'nothing'
+if use_importweight==0,
+    wj = roundn(rand(W^2,25).*0.2,-3);
+    wk = roundn(rand(25,10),-3);
     wk_ini = wk;
     wj_ini = wj;
 elseif use_importweight == 1,
@@ -22,7 +23,7 @@ elseif use_importweight == 2,
     wj = roundn(wj_ini.*0.1,-3);
     wk = wk_ini;
 else
-    error
+    error(msg)
 end
 Amean = ones(W^2,10);
 etak = 0.01;
@@ -44,7 +45,7 @@ for ll = 0:Ntrain*50
 
                 yj = xj'*wj./784;%wj':1x20
                 xk = 1./(1.+exp(-yj));  %1x20
-                yk = xk*wk./20;% 1x10;
+                yk = xk*wk./25;% 1x10;
                 err = d-yk;
 
 %%% change all
