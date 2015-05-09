@@ -7,11 +7,11 @@ Ntrain = 699; %800 pictures seperate into two parts
 Ntest = 99;
 W = 28; %28*28 picso
 
-use_importweight = 0;
+use_importweight = 1;
 msg = 'nothing'
 if use_importweight==0,
-    wj = roundn(rand(W^2,25).*0.2,-3);
-    wk = roundn(rand(25,10),-3);
+    wj = roundn(rand(W^2,20).*0.2,-3);
+    wk = roundn(rand(20,10),-3);
     wk_ini = wk;
     wj_ini = wj;
 elseif use_importweight == 1,
@@ -27,7 +27,7 @@ else
 end
 Amean = ones(W^2,10);
 etak = 0.01;
-etaj = 1;
+etaj = 0.5;
 %% read images and calculate the mean image for each digit
 for ll = 0:Ntrain*50
     % for k = 0;
@@ -36,7 +36,7 @@ for ll = 0:Ntrain*50
         n = ceil(rand*10)-1
         c = ceil(rand*0.7*1000)-1
             d = zeros(1,10);
-            d(n+1) = 0.5;
+            d(n+1) = 1;
 
 % for c = [0:(k*100-1),(k*100+100):(Ntrain+100)];
                 fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
@@ -47,14 +47,22 @@ for ll = 0:Ntrain*50
                 xk = 1./(1.+exp(-yj));  %1x20
                 yk = xk*wk./25;% 1x10;
                 err = d-yk;
+                % errj = (d-yk)+0.1*sum(sum(wj.^2));
 
 %%% change all
 
                 for nn = 0:9;
                     delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
                     wj = wj + etaj.*xj*delta';
+                    wj = wj + etaj.*xj*delta'.*(ones(784,20)+(0.0001*sum(sum(wj.^2)))/15680);
                     wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
+
                 end
+                % if max(abs(wj))>5,
+                %     wj = wj.*0.1;
+                % else
+                %     wj = wj;
+                % end
             % end
         % end
     % end
@@ -86,3 +94,5 @@ for CL = 1:10
     end
 end
 fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion))/sum(sum(confusion)));
+figure(2);
+mesh(linspace(1,20,20),linspace(1,784,784),wj);
