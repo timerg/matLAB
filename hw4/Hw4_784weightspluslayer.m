@@ -28,8 +28,10 @@ end
 Amean = ones(W^2,10);
 etak = 0.01;
 etaj = 0.5;
+al = 51
 %% read images and calculate the mean image for each digit
-for ll = 0:Ntrain*50
+accuracy_all =zeros(1,al);
+for ll = 0:Ntrain*al
     % for k = 0;
         % for n = 1:1;
         ll = ll
@@ -71,19 +73,15 @@ for ll = 0:Ntrain*50
     %         figure(2); subplot(4,3,sub); plot(ll,err(:,sub),'g.');hold on;drawnow;
     %     end
     % end
-end
-        for n = 0:9;
-            ww = wj*wk;
-            Amean(:,n+1) = reshape(ww(:,n+1).*255/10,W^2,1);
-            figure(1); subplot(3,4,n+1);
-            imshow(reshape(Amean(:,n+1),W,W),[0 255])
-        end
+% end
+ if mod(ll,Ntrain)==0
+
 %% testing
 accuracy = zeros(1,10);
 confusion = zeros(10,10);
-Fin_val = zeros(100,10)
-for CL = 1:10
-    for c = 700:799
+Fin_val = zeros(100,10);
+for CL = 1:10;
+    for c = 700:799;
         dist = zeros(1,10);
         fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
         A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fnamet]))./255;
@@ -93,6 +91,20 @@ for CL = 1:10
         Fin_val(c-699,CL) = y;
     end
 end
-fprintf('Total Accuracy = %2.1f%%\n',100*sum(diag(confusion))/sum(sum(confusion)));
+accuracy = 100*sum(diag(confusion))/sum(sum(confusion));
+fprintf('Total Accuracy = %2.1f%%\n',accuracy);
+
+accuracy_all(1,ll/Ntrain+1) = accuracy;
+end
+end
+
+for n = 0:9;
+    ww = wj*wk;
+    Amean(:,n+1) = reshape(ww(:,n+1).*255/10,W^2,1);
+    figure(1); subplot(3,4,n+1);
+    imshow(reshape(Amean(:,n+1),W,W),[0 255]);
+end
 figure(2);
+plot(linspace(0,51,52),accuracy_all,'r-');
+figure(3);
 mesh(linspace(1,20,20),linspace(1,784,784),wj);
