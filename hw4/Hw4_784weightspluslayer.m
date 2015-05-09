@@ -28,9 +28,9 @@ end
 Amean = ones(W^2,10);
 etak = 0.01;
 etaj = 0.5;
-al = 51
+al = 40
 %% read images and calculate the mean image for each digit
-accuracy_all =zeros(1,al);
+accuracy_all =zeros(1,al+1);
 for ll = 0:Ntrain*al
     % for k = 0;
         % for n = 1:1;
@@ -56,15 +56,15 @@ for ll = 0:Ntrain*al
                 for nn = 0:9;
                     delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
                     wj = wj + etaj.*xj*delta';
-                    wj = wj + etaj.*xj*delta'.*(ones(784,20)+(0.0001*sum(sum(wj.^2)))/15680);
+                    % wj = wj + etaj.*xj*delta'.*(ones(784,20)+(0.0005*sum(sum(wj.^2)))/15680);
                     wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
 
                 end
-                % if max(abs(wj))>5,
-                %     wj = wj.*0.1;
-                % else
-                %     wj = wj;
-                % end
+                if max(abs(wj))>5,
+                    wj = wj.*0.8;
+                else
+                    wj = wj;
+                end
             % end
         % end
     % end
@@ -105,6 +105,6 @@ for n = 0:9;
     imshow(reshape(Amean(:,n+1),W,W),[0 255]);
 end
 figure(2);
-plot(linspace(0,51,52),accuracy_all,'r-');
+plot(linspace(0,al,al+1),accuracy_all,'r-');
 figure(3);
 mesh(linspace(1,20,20),linspace(1,784,784),wj);
