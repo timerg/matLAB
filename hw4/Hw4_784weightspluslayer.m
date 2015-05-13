@@ -10,8 +10,8 @@ W = 28; %28*28 picso
 use_importweight = 1;
 msg = 'nothing'
 if use_importweight==0,
-    wj = roundn(rand(W^2,20).*0.2,-3);
-    wk = roundn(rand(20,10),-3);
+    wj = roundn(rand(W^2,20).*0.2,-10);
+    wk = roundn(rand(20,10),-10);
     wk_ini = wk;
     wj_ini = wj;
 elseif use_importweight == 1,
@@ -28,7 +28,7 @@ end
 Amean = ones(W^2,10);
 etak = 0.01;
 etaj = 0.5;
-al = 40
+al = 60
 %% read images and calculate the mean image for each digit
 accuracy_all =zeros(1,al+1);
 for ll = 0:Ntrain*al
@@ -37,65 +37,60 @@ for ll = 0:Ntrain*al
         ll = ll
         n = ceil(rand*10)-1
         c = ceil(rand*0.7*1000)-1
-            d = zeros(1,10);
-            d(n+1) = 1;
+        d = zeros(1,10);
+        d(n+1) = 1;
 
 % for c = [0:(k*100-1),(k*100+100):(Ntrain+100)];
-                fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
-                B = double(imread(fname));
-                xj = reshape(B./255,784,1);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
+        B = double(imread(fname));
+        xj = reshape(B./255,784,1);
 
-                yj = xj'*wj./784;%wj':1x20
-                xk = 1./(1.+exp(-yj));  %1x20
-                yk = xk*wk./25;% 1x10;
-                err = d-yk;
-                % errj = (d-yk)+0.1*sum(sum(wj.^2));
+        yj = xj'*wj./784;%wj':1x20
+        xk = 1./(1.+exp(-yj));  %1x20
+        yk = xk*wk./25;% 1x10;
+        err = d-yk;
+        % errj = (d-yk)+0.1*sum(sum(wj.^2));
 
 %%% change all
 
-                for nn = 0:9;
-                    delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
-                    wj = wj + etaj.*xj*delta';
-                    % wj = wj + etaj.*xj*delta'.*(ones(784,20)+(0.0005*sum(sum(wj.^2)))/15680);
-                    wk(:,nn+1) = wk(:,nn+1) + etak*err(:,nn+1).*xk';
+        for nn = 0:9;
+            % delta = err(nn+1)*wk(:,nn+1).*xk'.*(1.-xk');
+            delta = (err(nn+1)+(0.001*sum(sum(wj.^2)))/15680)*wk(:,nn+1).*xk'.*(1.-xk');
+            wj = wj + etaj.*xj*delta';
+            % wj = wj + etaj.*xj*delta'.*(ones(784,20)+(0.001*sum(sum(wj.^2)))/15680);
+            wk(:,nn+1) = wk(:,nn+1) + etak*(err(:,nn+1)+(0.001*sum(sum(wj.^2)))/15680).*xk';
+            if sum(sum(wj))./784>10,
+                wj.*0.001;
+                ans=1
+            else
+                wj = wj;
+                ans=0
+            end
 
-                end
-                if max(abs(wj))>5,
-                    wj = wj.*0.8;
-                else
-                    wj = wj;
-                end
-            % end
-        % end
-    % end
-    % if mod(ll,10)==0,
-    %     for sub = 1:10
-    %         figure(2); subplot(4,3,sub); plot(ll,err(:,sub),'g.');hold on;drawnow;
-    %     end
-    % end
-% end
- if mod(ll,Ntrain)==0
+        end
 
-%% testing
-accuracy = zeros(1,10);
-confusion = zeros(10,10);
-Fin_val = zeros(100,10);
-for CL = 1:10;
-    for c = 700:799;
-        dist = zeros(1,10);
-        fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
-        A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fnamet]))./255;
-        dist = (reshape(A,784,1)'*wj*wk);
-        [y,indmin] = max(dist);
-        confusion(CL,indmin) = confusion(CL,indmin)+1;
-        Fin_val(c-699,CL) = y;
-    end
-end
+         if mod(ll,Ntrain)==0
+
+        %% testing
+        accuracy = zeros(1,10);
+        confusion = zeros(10,10);
+        Fin_val = zeros(100,10);
+        for CL = 1:10
+            for c = 700:799;
+                dist = zeros(1,10);
+                fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
+                A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/' fnamet]))./255;
+                dist = (reshape(A,784,1)'*wj*wk);
+                [y,indmin] = max(dist);
+                confusion(CL,indmin) = confusion(CL,indmin)+1;
+                Fin_val(c-699,CL) = y;
+            end
+        end
 accuracy = 100*sum(diag(confusion))/sum(sum(confusion));
 fprintf('Total Accuracy = %2.1f%%\n',accuracy);
 
 accuracy_all(1,ll/Ntrain+1) = accuracy;
-end
+    end
 end
 
 for n = 0:9;
@@ -108,3 +103,21 @@ figure(2);
 plot(linspace(0,al,al+1),accuracy_all,'r-');
 figure(3);
 mesh(linspace(1,20,20),linspace(1,784,784),wj);
+
+%%new test
+accuracy = zeros(1,10);
+        confusion = zeros(10,10);
+        Fin_val = zeros(100,10);
+        for CL = 1:10
+            for c = 800:999;
+                dist = zeros(1,10);
+                fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
+                A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw5/test_data_new/' fnamet]))./255;
+                dist = (reshape(A,784,1)'*wj*wk);
+                [y,indmin] = max(dist);
+                confusion(CL,indmin) = confusion(CL,indmin)+1;
+                Fin_val(c-699,CL) = y;
+            end
+        end
+accuracy = 100*sum(diag(confusion))/sum(sum(confusion));
+fprintf('Total Accuracy = %2.1f%%\n',accuracy);
