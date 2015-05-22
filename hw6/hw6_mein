@@ -1,0 +1,5 @@
+clear all;
+close all;
+
+fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',n,c);
+A = double(imread(fname));
