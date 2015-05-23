@@ -55,14 +55,14 @@ for iii=1:V
         tolerance_vgs(ii) = tolerance;
         tolerance_percentagevgs(ii) = tolerance_percentage;;
         a_l(ii)=a;
-   
-    
+
+
     end
    tolernace_all(iii,:) = tolerance_vgs;
    tolerance_percentageall(iii,:) = tolerance_percentagevgs;
-   
+
    a_all(iii,:) = a_l
-   
+
 end
 Y = Vgs;
 X = linspace(1,L,L);
@@ -86,13 +86,10 @@ subplot(233);plot(X,Z(7,:));xlabel('vgs=2.6');
 subplot(234);plot(X,Z(6,:));xlabel('vgs=2.4');
 subplot(235);plot(X,Z(5,:));xlabel('vgs=2.2');
 figure(4);
-subplot(247);plot(Y,Z2(:,7));xlabel('L2-12');
-subplot(246);plot(Y,Z2(:,6));xlabel('L2-8');
-subplot(245);plot(Y,Z2(:,5));xlabel('L2-7');
-subplot(244);plot(Y,Z2(:,4));xlabel('L2-6');
+subplot(248);plot(Y,Z2(:,7));xlabel('L2-12');
+subplot(247);plot(Y,Z2(:,6));xlabel('L2-8');
+subplot(246);plot(Y,Z2(:,5));xlabel('L2-7');
+subplot(245);plot(Y,Z2(:,4));xlabel('L2-6');
 subplot(243);plot(Y,Z2(:,3));xlabel('vL2-4');
 subplot(242);plot(Y,Z2(:,2));xlabel('L2-3');
 subplot(241);plot(Y,Z2(:,1));xlabel('L2-1');
-
-
-
