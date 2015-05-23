@@ -6,8 +6,8 @@ wij = (round(rand(784,50).*40)-20);
 eta = 0.1;
 for c = 0:100;
   c=c
-fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
-% fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);   %for windows
+% fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
+fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);   %for windows
 A = double(imread(fname));
 vi = reshape(A./255,784,1);
   for aa = 1:100
@@ -38,7 +38,7 @@ vi = reshape(A./255,784,1);
       Etot_ = vi*(hj)'.*wij;
       wij = wij+eta*(Etot-Etot_);
     end
-  % figure(1)
+  figure(1);
   for cc = 1:10;
     pic = (reshape(wij(:,cc),28,28)+20).*255/40;
     subplot(5,10,cc); imshow( pic,[0 255]); hold on;
