@@ -7,6 +7,7 @@ wij = roundn(rvalue,-0) ;
 
 for c = 0:0;
 fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
+fname = sprintf('~Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
 A = double(imread(fname));
 vi = reshape(A./255,784,1);
 
