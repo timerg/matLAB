@@ -2,8 +2,7 @@ clear all;
 close all;
 
 hj = zeros(50,1);
-rvalue = (rand(784,50)-0.5).*40;
-wij = roundn(rvalue,-0) ;
+wij = (round(rand(784,50).*100)-50).*(2/5) ;
 
 for c = 0:0;
 % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
