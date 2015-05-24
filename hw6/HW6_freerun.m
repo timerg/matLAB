@@ -3,13 +3,13 @@
 % May 13, 2015
 
 clear; close all; clc;
-DIR = '~/Desktop/NN/';
+DIR = '~/GitHub/matlab/hw6';
 fname = 'scarlett-sq.png';
 v0 = imread([DIR fname]);
 v0 = imresize(v0,[28 28]);
 v0 = double(rgb2gray(v0))/256;
-T = 400; % initial temperature relative to training. Empirically, 
-         % T=400 works well for "Digit2", and T=60 works well for "all digits". 
+T = 400; % initial temperature relative to training. Empirically,
+         % T=400 works well for "Digit2", and T=60 works well for "all digits".
 th = 0.65; % binary threshold to convert from gray-level to binary
 
 figure(1);
@@ -62,7 +62,7 @@ for c = 1:numIter
         figure(1); subplot(2,4,c+4); imshow(imresize(v,[140 140]));
         xlabel(sprintf('v%1d',c));
     else
-    
+
     figure(2);
         imshow(imresize(v,[140 140])); xlabel('v^{(n)}')
         %pause;

@@ -2,7 +2,7 @@
 % May 10, 2015
 % YWLiu
 clear; close all;
-DIR = '~/Desktop/NN/DigitFiles/';
+DIR = '~/GitHub/matlab/hw6';
 
 Ntrain = 2000;
 numImages = 1000; % number of examples for each digit
@@ -31,26 +31,26 @@ numRepeats = 1; % number of repeats to estimate statistics
 for c = 1:Ntrain
     seednum = floor(numImages*rand);
     if ~sw.learnAllDigits,
-        fname = sprintf('digit_%1d_%03d.bmp',SymbolNum,seednum);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
     else
-        fname = sprintf('digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',floor(rand*10),seednum);
     end
-    v0 = double(imread([DIR fname])>0);
+    v0 = double(imread([fname])>0);
     CorHV0 = zeros(WID, HGT, numHid);
-        
+
     %% v0->h0
     for k = 1:numHid
-        DeltaE(k) = sum(sum(W(:,:,k).*v0)); 
+        DeltaE(k) = sum(sum(W(:,:,k).*v0));
                     % energy decrement if h(k) drops from 0 to 1
     end
     p = 1./(1+exp(-DeltaE)); % probability(h==1)
     tmp = rand(numHid,1);
-    
+
     CorHV1 = zeros(WID, HGT, numHid); % re-initialize <v1,h1> = 0
 
     for rr = 1:numRepeats
         h0 = (tmp < p); % simulation repeats several times
-        
+
         %% h0->v1
         for ii = 1:WID
             for jj = 1:HGT
@@ -83,7 +83,7 @@ for c = 1:Ntrain
     end
     %% Updating the weights
     W = W + rho * (CorHV0 - CorHV1);
-    
+
     %% monitoring the weight evolution
     figure(1);
     if mod(c,20) == 0,
@@ -114,4 +114,3 @@ for c = 1:Ntrain
         imshow(q); xlabel('reconstruction probability')
     end
 end
-
