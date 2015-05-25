@@ -31,9 +31,11 @@ numRepeats = 1; % number of repeats to estimate statistics
 for c = 1:Ntrain
     seednum = floor(numImages*rand);
     if ~sw.learnAllDigits,
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
     else
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',floor(rand*10),seednum);
     end
     v0 = double(imread([fname])>0);
     CorHV0 = zeros(WID, HGT, numHid);
