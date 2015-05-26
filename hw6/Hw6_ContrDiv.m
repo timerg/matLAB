@@ -56,7 +56,7 @@ for c = 1:Ntrain
         %% h0->v1
         for ii = 1:WID
             for jj = 1:HGT
-                w_h = squeeze(W(ii,jj,:));
+                w_h = squeeze(W(ii,jj,:));    %the 50 weights connect to the ii,jj_th visible unit
                 DeltaE_h2v(ii,jj) = w_h'*h0;
                 % energy decrement if v(i,j) drops from 0 to 1
             end
