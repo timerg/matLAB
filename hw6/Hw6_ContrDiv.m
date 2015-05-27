@@ -9,7 +9,7 @@ Ntrain = 2000;
 numImages = 1000; % number of examples for each digit
 WID = 28; % width of images
 HGT = 28; % height of images
-sw.learnAllDigits = 1;
+sw.learnAllDigits = 0;
 sw.meanfield = 0; % this part is under construction, didn't work
 
 if ~sw.learnAllDigits,
@@ -47,7 +47,8 @@ for c = 1:Ntrain
                     % energy decrement if h(k) drops from 0 to 1
     end
     p = 1./(1+exp(-DeltaE)); % probability(h==1)
-    tmp = rand(numHid,1);          %                             Why use random tmp
+    % tmp = rand(numHid,1);
+    tmp = 0.5 .* ones(numHid,1);          %                             Why use random tmp
 
     CorHV1 = zeros(WID, HGT, numHid); % re-initialize <v1,h1> = 0
 
@@ -71,6 +72,7 @@ for c = 1:Ntrain
         end
         p = 1./(1+exp(-DeltaE)); % probability(h==1)
         tmp = rand(numHid,1);
+        tmp = 0.5 .* ones(numHid,1);          %                             Why use random tmp
         h1 = (tmp < p);
         for k = 1:numHid
             if sw.meanfield,

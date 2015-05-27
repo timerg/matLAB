@@ -11,11 +11,11 @@ gibbs = 0;
 only2=1;
 % train
 for c = 1:Nbmp;
-    cc = ceil(rand*1000)
-    if only2==1,
+    cc = ceil(rand*1000);
+    if only2 == 1,
         fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
         % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
-    elseif only2==0,
+    elseif only2 == 0,
         fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
         % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
@@ -59,7 +59,7 @@ vi = reshape(A./255, 784, 1);
   elseif gibbs,
     Etotr = zeros(1000,1);
     Ntrain = 10000
-    for aa = 1:Ntrain
+    for aa = 1:Ntrain;
       vh = ceil(rand*50);
       hj0 = hj;
       hj1 = hj;
