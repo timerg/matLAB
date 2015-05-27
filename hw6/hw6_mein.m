@@ -121,12 +121,11 @@ vi = reshape(A./255,784,1);
   end
   if rem(c,(Nbmp/10))==0,
       figure(2)
-      subplot(2,10,c/Nbmp*10); imshow(A,[0 255]);
-      subplot(2,10,10+c/Nbmp*10); imshow(reshape((vi.*255),28,28),[0 255]);
+      subplot(3,10,c/Nbmp*10); imshow(A,[0 255]);
+      subplot(3,10,10+c/Nbmp*10); imshow(reshape((vi.*255),28,28),[0 255]);
+      subplot(3,10,20+c/Nbmp*10); imshow(reshape((p4.*255),28,28),[0 255]);
   end
    c=c
 end
-figure(3);
-  imshow(reshape((vi.*255),28,28),[0 255])
 figure(4)
   plot([1:Ntrain],Etotr,'r-')

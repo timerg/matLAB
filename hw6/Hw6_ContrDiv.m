@@ -88,32 +88,32 @@ for c = 1:Ntrain
     W = W + rho * (CorHV0 - CorHV1);
 
     %% monitoring the weight evolution
-    figure(1);
-    if mod(c,20) == 0,
-        % sorting the hidden nodes according to its overall strength of connection
-        strength = [zeros(numHid,1) (1:numHid)'];
-        for n = 1:numHid
-            strength(n,1) = max(max(abs(W(:,:,n))));
-        end
-        strength = sortrows(strength,1);
-        D = abs(strength(end,1));
-        figure(1);
-        %set(gcf,'position',[40,70,780,570]);
-        for n = 1:min(numHid,25)
-            subplot(5,5,n);
-            imshow(W(:,:,strength(numHid-n+1,2)),[-D D]);
-            h=text(2,-2,sprintf('%03d',strength(numHid-n+1,2)));
-            set(h,'color','r');
-        end
-        fprintf('processing image #%1d\n',c);
-    end
-    if mod(c,100) == 0,
+    % figure(1);
+    % if mod(c,20) == 0,
+    %     % sorting the hidden nodes according to its overall strength of connection
+    %     strength = [zeros(numHid,1) (1:numHid)'];
+    %     for n = 1:numHid
+    %         strength(n,1) = max(max(abs(W(:,:,n))));
+    %     end
+    %     strength = sortrows(strength,1);
+    %     D = abs(strength(end,1));
+    %     figure(1);
+    %     %set(gcf,'position',[40,70,780,570]);
+    %     for n = 1:min(numHid,25)
+    %         subplot(5,5,n);
+    %         imshow(W(:,:,strength(numHid-n+1,2)),[-D D]);
+    %         h=text(2,-2,sprintf('%03d',strength(numHid-n+1,2)));
+    %         set(h,'color','r');
+    %     end
+    %     fprintf('processing image #%1d\n',c);
+    % end
+    if mod(c,Ntrain/10) == 0,
         figure(2)
-        subplot(221)
+        subplot(3,10,c*10/Ntrain)
         imshow(v0); xlabel('input')
-        subplot(222)
+        subplot(3,10,10+c*10/Ntrain)
         imshow(v1); xlabel('recons')
-        subplot(223)
-        imshow(q); xlabel('reconstruction probability')
+        subplot(3,10,20+c*10/Ntrain)
+        imshow(q); xlabel('recons p')
     end
 end
