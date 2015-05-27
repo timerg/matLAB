@@ -7,7 +7,7 @@ eta = 0.05;
 Nbmp = 2000
 
 % mode
-gibbs = 0;
+gibbs = 1;
 only2=1;
 % train
 for c = 1:Nbmp;
@@ -31,27 +31,27 @@ vi = reshape(A./255, 784, 1);
       E1  = (vi)'*wij;      %probability for hj = 1
       p1 = 1./(1+exp(-E1));        %％also, for hj(x)=0, E1(x)=0, p1(x)=0.5
       Etot1 = vi*p1;              %the expectation value is: p*vin*h(=1)   p is still come from h,v
-    %   t1 = rand(1,50);
-      t1 = 0.5;
+      t1 = rand(1,50);
+      % t1 = 0.5;
       hj = (p1> t1)';
 % end
       E2  = (hj)'*(wij)';      %E2 is 1x784
       p2 = 1./(1+exp(-E2));
-    %   t2 = rand(1,784);
-      t2 = 0.5;
+      t2 = rand(1,784);
+      % t2 = 0.5;
       vi = (p2> t2)';
 
       E3  = (vi)'*wij;
       p3 = 1./(1+exp(-E3));
       Etot3 = vi*p3;
-    %   t3 = rand(1,50);
-      t3 = 0.5;
+      t3 = rand(1,50);
+      % t3 = 0.5;
       hj = (p1> t3)';
 
       E4  = (hj)'*(wij)';      %E2 is 1x784
       p4 = 1./(1+exp(-E4));
-    %   t4 = rand(1,784);
-      t4 = 0.5;
+      t4 = rand(1,784);
+      % t4 = 0.5;
       vi = (p4> t4)';
 % change wij
       wij = wij+eta*(Etot1-Etot3);
@@ -130,5 +130,5 @@ vi = reshape(A./255, 784, 1);
   end
    c=c
 end
-% figure(4)
-%   plot([1:Ntrain],Etotr,'r-')
+figure(4)
+  plot([1:Ntrain],Etotr,'r-')
