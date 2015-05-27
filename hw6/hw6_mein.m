@@ -9,14 +9,14 @@ Nbmp = 2000
 % mode
 gibbs=0;
 only2=1;
-for c = 0:Nbmp;
-    cc = ceil(rand*1000)-1
+for c = 1:Nbmp;
+    cc = ceil(rand*1000)
     if only2==0,
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2==1,
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
 A = double(imread(fname));
 vi = reshape(A./255,784,1);
@@ -112,15 +112,17 @@ vi = reshape(A./255,784,1);
   end
 
 
-  if mod(c+1,Nbmp+1) ==0,
+  if mod(c,Nbmp) ==0,
     figure(1);
     for cp = 1:50;
           pic = round(reshape(((wij(:,cp)+1).*(255/2)),28,28));
           subplot(5,10,cp); imshow( pic,[min(min(pic)) max(max(pic))]); hold on;
     end
   end
-  if mod(c,Nbmp/10) ==0
+  if rem(c,(Nbmp/10))==0,
       figure(2)
+      subplot(2,10,c/Nbmp*10); imshow(A,[0 255]);
+      subplot(2,10,10+c/Nbmp*10); imshow(reshape((vi.*255),28,28),[0 255]);
   end
    c=c
 end
