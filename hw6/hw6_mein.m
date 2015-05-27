@@ -4,14 +4,23 @@ close all;
 hj = randi([0 1],50,1);
 wij = ((rand(784,50)))-0.5;
 eta = 0.05;
-for c = 0:999;
-fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
-% fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);   %for windows
+Nbmp = 2000
+
+% mode
+gibbs=0;
+only2=1;
+for c = 0:Nbmp;
+    cc = ceil(rand*1000)-1
+    if only2==0,
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',c);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+    elseif only2==1,
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+    end
 A = double(imread(fname));
 vi = reshape(A./255,784,1);
 
-% mode
-gibbs=1;
 
   if ~gibbs,
     for aa = 1:1;
@@ -48,7 +57,8 @@ gibbs=1;
     end
   elseif gibbs,
     Etotr = zeros(1000,1);
-    for aa = 1:1000;
+    Ntrain = 10000
+    for aa = 1:Ntrain
       vh = ceil(rand*50);
       hj0 = hj;
       hj1 = hj;
@@ -80,7 +90,9 @@ gibbs=1;
       Eon = (vi)'*wij*hj1;
       deltaE3 = Eoff-Eon;
       p3= 1/(1+exp(-deltaE3));
-      Etot3 = p3.*vi;
+      if aa == Ntrain,
+          Etot3 = p3.*vi;
+      end
       hj(vh,:) = (p3>0.5);
 
       vi0 = vi;
@@ -92,23 +104,27 @@ gibbs=1;
       deltaE4 = Eoff-Eon;
       p4 = 1/(1+exp(-deltaE4));
       vi(hv,:) = (p4>0.5);
-
-      wij(:,vh) = wij(:,vh)+eta*(Etot1-Etot3);
-      Ｅtotr(aa,1) = deltaE4;
+      if aa == Ntrain,
+          wij(:,vh) = wij(:,vh)-eta*(Etot1-Etot3);
+      end
+      Etotr(aa,1) = deltaE4;
     end
   end
 
 
-  if mod(c+1,1000) ==0,
+  if mod(c+1,Nbmp+1) ==0,
     figure(1);
-    for cc = 1:50;
-          pic = round(reshape(((wij(:,cc)+1).*(255/2)),28,28));
-          subplot(5,10,cc); imshow( pic,[-83 268]); hold on;
+    for cp = 1:50;
+          pic = round(reshape(((wij(:,cp)+1).*(255/2)),28,28));
+          subplot(5,10,cp); imshow( pic,[min(min(pic)) max(max(pic))]); hold on;
     end
+  end
+  if mod(c,Nbmp/10) ==0
+      figure(2)
   end
    c=c
 end
-figure(2);
+figure(3);
   imshow(reshape((vi.*255),28,28),[0 255])
-figure(3)
-  plot([1:1000],Etotr,'r-')
+figure(4)
+  plot([1:Ntrain],Etotr,'r-')
