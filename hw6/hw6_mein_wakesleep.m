@@ -14,7 +14,7 @@ b2 = 0;
 b3 = 0;
 b4 = 0;
 %% parameters
-eta = 0.05;
+etaa = 0.05;
 Nbmp = 1000
 
 % mode
@@ -36,30 +36,30 @@ for c = 1:Nbmp;
     for aa = 1: 10
 % wake phase
       Ej = ((vi)' * wij_r)';
-      hj = gt((1 ./ (1 + exp(-Ej))),0.5);         %200x1
+      hj = gt((1 ./ (1 + exp(-Ej))), 0.5);         %200x1
       Ek = ((hj)' * wjk_r)';
-      hk = gt((1 ./ (1 + exp(-Ek))),0.5);         %50x1
+      hk = gt((1 ./ (1 + exp(-Ek))), 0.5);         %50x1
 
-      E_w1  = (hk)' * wjk_w;           %1x200
+      E_w1  = (hk)' * wjk_w ./ 50;           %1x200
       p1 = 1 ./ (1 + exp(-b1 - E_w1));        %200x1
-      wjk_w = wjk_w + hk * ((hj)' - p1);
+      wjk_w = wjk_w + etaa .* hk * ((hj)' - p1);
 
-      E_w2  = (hj)' * wij_w;           %1x200
+      E_w2  = (hj)' * wij_w ./ 200;           %1x200
       p2 = 1 ./ (1 + exp(-b2 - E_w2));        %200x1
-      wij_w = wij_w + hj * ((vi)' - p2);
+      wij_w = wij_w + etaa .* hj * ((vi)' - p2);
 % sleep phase
       Ej = ((hk)' * wjk_w)';
-      hj = gt((1 ./ (1 + exp(-Ej))),0.5);
+      hj = gt((1 ./ (1 + exp(-Ej))), 0.5);
       Ei = ((hj)' * wij_w)';
-      vi = gt((1 ./ (1 + exp(-Ei))),0.5);
+      vi = gt((1 ./ (1 + exp(-Ei))), 0.5);
 
-      E_s1  = (vi)' * wij_r;
+      E_s1  = (vi)' * wij_r ./ 784;
       p3 = 1 ./ (1 + exp(-b3-E_s1));
-      wij_r = wij_r + vi * ((hj)' - p3);
+      wij_r = wij_r + etaa .* vi * ((hj)' - p3);
 
-      E_s2  = (hj)' * wjk_r;      %E2 is 1x784
+      E_s2  = (hj)' * wjk_r ./200;      %E2 is 1x784
       p4 = 1 ./ (1 + exp(-E_s2));
-      wjk_r = wjk_r + hj * ((hk)' - p4);
+      wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
 
   end
 
