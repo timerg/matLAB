@@ -1,6 +1,9 @@
 clear all;
 close all;
 
+
+
+
 nh1 = 500;
 nh2 = 500;
 nt = 2000;
@@ -21,7 +24,7 @@ b2 = 0;
 b3 = 0;
 b4 = 0;
 %% parameters
-etaa = 0.05;
+etaa = 0.01;
 Nbmp = 1000;
 tt = 0.5;
 
@@ -34,12 +37,12 @@ for c = 1:Nbmp
     cc = ceil(rand*999);
     if only2 == 1,
         digit = 2;
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2 == 0,
         digit = floor(rand*10);
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
     A = double(imread(fname));
     vi = reshape(A./255, 784, 1);
@@ -146,7 +149,8 @@ for tc = 1:t_times;
     digit_t = floor(rand*10);
   end
   Iin(1, tc) = digit_t + 1;   %recording
-  ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
   B = double(imread(ftname));
   vt = reshape(B./255, 784, 1);
   pvtij = 1 ./ (1 + exp(-(vt)' * (wij_w)'));

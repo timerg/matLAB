@@ -13,11 +13,11 @@ only2 = 0;
 for c = 1:Nbmp;
     cc = ceil(rand*999);
     if only2 == 1,
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2 == 0,
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
 A = double(imread(fname));
 vi = reshape(A./255, 784, 1);
@@ -130,5 +130,22 @@ vi = reshape(A./255, 784, 1);
   end
    c=c
 end
-figure(4)
-  plot([1:Ntrain],Etotr,'r-')
+% figure(4)
+%   plot([1:Ntrain],Etotr,'r-')
+
+%% testing
+t_times = 10;
+for tc = 1:t_times;
+  tcc = floor(rand * 999);
+  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10), tcc);
+  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10), tcc);
+  B = double(imread(ftname));
+  vit = reshape(B./255, 784, 1);
+  pij = 1 ./ (1 + exp(-(vit)' * (wij)));
+  hjt = gt(pij, rand);
+  pji = 1 ./ (1 + exp(-hjt  * (wij)'));
+  vitr = gt(pji, rand);
+  figure(3)
+  subplot(3, 10, tc / (t_times / 10)); imshow(B, [0 255]);
+  subplot(3, 10, 10 + tc / (t_times / 10)); imshow(reshape((vitr .* 255), 28, 28), [0 255]);
+end

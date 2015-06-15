@@ -4,6 +4,7 @@
 clear; close all;
 % DIR = 'Users/timer/Documents/GitHub/matlab/hw6';
 DIR = '~/GitHub/matlab/hw6';
+DIR = '/users/timer/Documents/gitHub/matlab/hw6';
 
 Ntrain = 2000;
 numImages = 1000; % number of examples for each digit
@@ -32,11 +33,11 @@ numRepeats = 1; % number of repeats to estimate statistics
 for c = 1:Ntrain
     seednum = floor(numImages*rand);
     if ~sw.learnAllDigits,
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_%1d_%03d.bmp',SymbolNum,seednum);
     elseif sw.learnAllDigits,
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
+        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),seednum);
     end
     v0 = double(imread([fname])>0);
     CorHV0 = zeros(WID, HGT, numHid);
