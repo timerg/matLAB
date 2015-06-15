@@ -22,7 +22,7 @@ b3 = 0;
 b4 = 0;
 %% parameters
 etaa = 0.05;
-Nbmp = 2000;
+Nbmp = 1000;
 tt = 0.5;
 
 % mode
@@ -30,7 +30,7 @@ gibbs = 0;
 only2 = 0;
 rr = 1;
 % train
-for c = 1:Nbmp;
+for c = 1:Nbmp
     cc = ceil(rand*999);
     if only2 == 1,
         digit = 2;
@@ -135,7 +135,7 @@ for c = 1:Nbmp;
 end
 
 %% text
-t_times = 100;
+t_times = 500;
 I = zeros(1, t_times);
 testresult = zeros(1, t_times);
 for tc = 1:t_times;
@@ -186,4 +186,4 @@ subplot(4,1,3);plot((1:nh2), p3, 'r-');
 subplot(4,1,4);plot((1:nh2), p4, 'r-');
 
 figure(5)
-plot(1:100, I, 'g-', 1:100, Iin, 'r-');
+plot(1:t_times, I, 'g-', 1:t_times, Iin, 'r-');
