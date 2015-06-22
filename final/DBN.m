@@ -15,7 +15,7 @@ wij_w = rand(nh1, 784) - 0.5;
 wjk_r = rand(nh1, nh2) - 0.5;
 wjk_w = rand(nh2, nh1) - 0.5;
 % Top RBM weoghts
-wkt = rand(nh2 + nd, nt) - 0.5;
+wktl = rand(nh2 + nd, nt) - 0.5;
 
 %% bias
 b0 = 0;
@@ -37,12 +37,12 @@ for c = 1:Nbmp
     cc = ceil(rand*999);
     if only2 == 1,
         digit = 2;
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2 == 0,
         digit = floor(rand*10);
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
     A = double(imread(fname));
     vi = reshape(A./255, 784, 1);
@@ -96,25 +96,25 @@ for c = 1:Nbmp
               hl = zeros(10, 1);
               hl(digit + 1) = 1;
               hkl = [hk;hl];      %510x1
-              Ekt1  = (hkl)' * wkt;       %1x2000
+              Ekt1  = (hkl)' * wktl;       %1x2000
               pkt1 = 1 ./ (1 + exp(-Ekt1));
               Etot1 = hkl * pkt1;
               ht = gt(pkt1, rand)';       %2000x1
         % end
-              Etk1  = (ht)' * (wkt)';
+              Etk1  = (ht)' * (wktl)';
               ptk1 = 1 ./ (1 + exp(-Etk1));
               hkl = gt(ptk1, rand)';
 
-              Ekt2  = (hkl)' * wkt;
+              Ekt2  = (hkl)' * wktl;
               pkt2 = 1 ./ (1 + exp(-Ekt2));
               Etot2 = hkl * pkt2;
               ht = gt(pkt2, rand)';
 
-              Etk2  = (ht)' * (wkt)';      %E2 is 1x784
+              Etk2  = (ht)' * (wktl)';      %E2 is 1x784
               ptk2 = 1 ./ (1 + exp(-Etk2));
               hkl = gt(ptk2, rand)';
         % change wij
-              wkt = wkt + etaa*(Etot1-Etot2);
+              wktl = wktl + etaa*(Etot1-Etot2);
 
   end
 
@@ -149,8 +149,8 @@ for tc = 1:t_times;
     digit_t = floor(rand*10);
   end
   Iin(1, tc) = digit_t + 1;   %recording
-  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
-  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  % ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
   B = double(imread(ftname));
   vt = reshape(B./255, 784, 1);
   pvtij = 1 ./ (1 + exp(-(vt)' * (wij_w)'));
@@ -158,10 +158,10 @@ for tc = 1:t_times;
   pvtjk = 1 ./ (1 + exp(-(vtj)'  * (wjk_w)'));
   vtk = gt(pvtjk, rand)';
 
-  Et1 =  [(vtk)' randi([-1, 1],1 ,nd)] * wkt;
+  Et1 =  [(vtk)' randi([-1, 1],1 ,nd)] * wktl;
   pt1 = 1 ./ (1 + exp(-Et1));
-  htt = gt(pt1, rand)';ㄋ
-  pt2 = 1 ./ (1 + exp(-(htt)'  * (wkt)'));
+  htt = gt(pt1, rand)';
+  pt2 = 1 ./ (1 + exp(-(htt)'  * (wktl)'));
   vtk_final = gt(pt2, rand)';
 
   pvtkj = 1 ./ (1 + exp(-(vtk)' * wjk_w));
@@ -191,3 +191,19 @@ subplot(4,1,4);plot((1:nh2), p4, 'r-');
 
 figure(5)
 plot(1:t_times, I, 'g-', 1:t_times, Iin, 'r-');
+
+
+wkt = wktl(1:nh2, :);
+wtl = (wktl((nh2 + 1):(nh2 + nd), :))';
+wij_wi = (wij_w)';
+wjk_wi = (wjk_w)';
+
+%% save data
+save('~/GitHub/matLAB/final/weight_ij', 'wij_wi')
+save('~/GitHub/matLAB/final/weight_jk', 'wjk_wi')
+save('~/GitHub/matLAB/final/weight_kt', 'wkt')
+save('~/GitHub/matLAB/final/weight_tl', 'wtl')
+save('~/GitHub/matLAB/final/hidden_j', 'hj')
+save('~/GitHub/matLAB/final/hidden_k', 'hk')
+save('~/GitHub/matLAB/final/hidden_t', 'ht')
+save('~/GitHub/matLAB/final/hidden_l', 'hl')
