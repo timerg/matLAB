@@ -25,7 +25,7 @@ b3 = 0;
 b4 = 0;
 %% parameters
 etaa = 0.01;
-Nbmp = 1000;
+Nbmp = 10000;
 tt = 0.5;
 
 % mode
