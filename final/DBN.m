@@ -49,83 +49,82 @@ for c = 1:Nbmp
 
     for aa = 1: 1
 % wake phase
-      Ej = ((vi)' * (wij_w)')';
-      if rr,
-        hj = gt((1 ./ (1 + exp(-Ej))), rand);
-      else
-        hj = gt((1 ./ (1 + exp(-Ej))), tt);         %200x1
-      end
-      Ek = ((hj)' * (wjk_w)')';
-      if rr,
-        hk = gt((1 ./ (1 + exp(-Ek))), rand);
-      else
-        hk = gt((1 ./ (1 + exp(-Ek))), tt);         %50x1
-      end
+        Ej = ((vi)' * wij_r)';
+        if rr,
+          hj = gt((1 ./ (1 + exp(-Ej))), rand);
+        else
+          hj = gt((1 ./ (1 + exp(-Ej))), tt);         %200x1
+        end
+        Ek = ((hj)' * wjk_r)';
+        if rr,
+          hk = gt((1 ./ (1 + exp(-Ek))), rand);
+        else
+          hk = gt((1 ./ (1 + exp(-Ek))), tt);         %50x1
+        end
 
-      %%
-      E_w1  = (hk)' * wjk_w;           %1x200
-      p1 = 1 ./ (1 + exp(-b1 - E_w1));        %200x1
-      wjk_w = wjk_w + etaa .* hk * ((hj)' - p1);
+        %%
+        E_w1  = (hk)' * wjk_w;           %1x200
+        p1 = 1 ./ (1 + exp(-b1 - E_w1));        %200x1
+        wjk_w = wjk_w + etaa .* hk * ((hj)' - p1);
 
-      E_w2  = (hj)' * wij_w;           %1x200
-      p2 = 1 ./ (1 + exp(-b2 - E_w2));        %200x1
-      wij_w = wij_w + etaa .* hj * ((vi)' - p2);
-% sleep phase
-      Ej = ((hk)' * wjk_w)';
-      if rr,
-        hj = gt((1 ./ (1 + exp(-Ej))), rand);
-      else
-        hj = gt((1 ./ (1 + exp(-Ej))), tt);
-      end
-      Ei = ((hj)' * wij_w)';
-      if rr,
-        vi = gt((1 ./ (1 + exp(-Ei))), rand);
-      else
-        vi = gt((1 ./ (1 + exp(-Ei))), tt);
-      end
+        E_w2  = (hj)' * wij_w;           %1x200
+        p2 = 1 ./ (1 + exp(-b2 - E_w2));        %200x1
+        wij_w = wij_w + etaa .* hj * ((vi)' - p2);
+  % sleep phase
+        Ej = ((hk)' * wjk_w)';
+        if rr,
+          hj = gt((1 ./ (1 + exp(-Ej))), rand);
+        else
+          hj = gt((1 ./ (1 + exp(-Ej))), tt);
+        end
+        Ei = ((hj)' * wij_w)';
+        if rr,
+          vi = gt((1 ./ (1 + exp(-Ei))), rand);
+        else
+          vi = gt((1 ./ (1 + exp(-Ei))), tt);
+        end
 
-      E_s1  = (vi)' * wij_r;
-      p3 = 1 ./ (1 + exp(-b3-E_s1));
-      wij_r = wij_r + etaa .* vi * ((hj)' - p3);
+        E_s1  = (vi)' * wij_r;
+        p3 = 1 ./ (1 + exp(-b3-E_s1));
+        wij_r = wij_r + etaa .* vi * ((hj)' - p3);
 
-      E_s2  = (hj)' * wjk_r;      %E2 is 1x784
-      p4 = 1 ./ (1 + exp(-E_s2));
-      wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
+        E_s2  = (hj)' * wjk_r;      %E2 is 1x784
+        p4 = 1 ./ (1 + exp(-E_s2));
+        wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
 
-      %% Top RBM with label train
-              hl = zeros(10, 1);
-              hl(digit + 1) = 1;
-              hkl = [hk;hl];      %510x1
-              Ekt1  = (hkl)' * wktl;       %1x2000
-              pkt1 = 1 ./ (1 + exp(-Ekt1));
-              Etot1 = hkl * pkt1;
-              ht = gt(pkt1, rand)';       %2000x1
-        % end
-              Etk1  = (ht)' * (wktl)';
-              ptk1 = 1 ./ (1 + exp(-Etk1));
-              hkl = gt(ptk1, rand)';
+        %% Top RBM with label train
+                hl = zeros(10, 1);
+                hl(digit + 1) = 1;
+                hkl = [hk;hl];      %510x1
+                Ekt1  = (hkl)' * wktl;       %1x2000
+                pkt1 = 1 ./ (1 + exp(-Ekt1));
+                Etot1 = hkl * pkt1;
+                ht = gt(pkt1, rand)';       %2000x1
+          % end
+                Etk1  = (ht)' * (wktl)';
+                ptk1 = 1 ./ (1 + exp(-Etk1));
+                hkl = gt(ptk1, rand)';
 
-              Ekt2  = (hkl)' * wktl;
-              pkt2 = 1 ./ (1 + exp(-Ekt2));
-              Etot2 = hkl * pkt2;
-              ht = gt(pkt2, rand)';
+                Ekt2  = (hkl)' * wktl;
+                pkt2 = 1 ./ (1 + exp(-Ekt2));
+                Etot2 = hkl * pkt2;
+                ht = gt(pkt2, rand)';
 
-              Etk2  = (ht)' * (wktl)';      %E2 is 1x784
-              ptk2 = 1 ./ (1 + exp(-Etk2));
-              hkl = gt(ptk2, rand)';
-        % change wij
-              wktl = wktl + etaa*(Etot1-Etot2);
+                Etk2  = (ht)' * (wktl)';      %E2 is 1x784
+                ptk2 = 1 ./ (1 + exp(-Etk2));
+                hkl = gt(ptk2, rand)';
+          % change wij
+                wktl = wktl + etaa*(Etot1-Etot2);
 
   end
 
+%% to show the reconstruction
+Er1 = ((vi)' * (wij_w)')';
+pr1 = sigmoid(Er1);
+hrj = gt(pr1, rand);
+Er2 =
 
-  if mod(c,Nbmp) == 0,
-    figure(1);
-    for cp = 1:50;
-          % pic = round(reshape(((wij_w(:,cp)+1).*(255/2)),28,28));
-          % subplot(5,10,cp); imshow( pic,[min(min(pic)) max(max(pic))]); hold on;
-    end
-  end
+
   if rem(c,(Nbmp/10)) == 0,
       figure(2)
       subplot(3, 10, c/Nbmp * 10); imshow(A, [0 255]);
@@ -137,7 +136,7 @@ for c = 1:Nbmp
   end
 end
 
-%% text
+%% test
 t_times = 500;
 I = zeros(1, t_times);
 testresult = zeros(1, t_times);
