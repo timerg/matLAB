@@ -35,7 +35,7 @@ etat = 0.01;
 etai = 0.01;
 etaj = 0.01;
 etas = 0.1;
-Nbmp = 1000;
+Nbmp = 200;
 tt = 0.5;
 
 % mode
@@ -60,9 +60,9 @@ for c = 1:Nbmp
     for aa = 1: 1
 % wake phase
         Ej = ((vi)' * wij_r)';
-        hj = gt((1 ./ (1 + exp(-Ej))), rand);
+        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
         Ek = ((hj)' * wjk_r)';
-        hk = gt((1 ./ (1 + exp(-Ek))), rand);
+        hk = gt((1 ./ (1 + exp(-Ek))), rand(nh2, 1));
 
         %%
         E_w1  = (hk)' * wjk_w;           %1x200
@@ -74,9 +74,9 @@ for c = 1:Nbmp
         wij_w = wij_w + etaa .* hj * ((vi)' - p2);
   % sleep phase
         Ej = ((hk)' * wjk_w)';
-        hj = gt((1 ./ (1 + exp(-Ej))), rand);
+        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh2, 1));
         Ei = ((hj)' * wij_w)';
-        vi = gt((1 ./ (1 + exp(-Ei))), rand);
+        vi = gt((1 ./ (1 + exp(-Ei))), rand(nin, 1));
 
 
         E_s1  = (vi)' * wij_r;
@@ -86,36 +86,63 @@ for c = 1:Nbmp
         E_s2  = (hj)' * wjk_r;      %E2 is 1x784
         p4 = 1 ./ (1 + exp(-E_s2));
         wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
+        if rem(c,(Nbmp/10)) == 0,
+            figure(2);title('during train')
+            subplot(2, 10, c/Nbmp * 10); imshow(A, [0 255]);
+            subplot(2, 10, 10 + c / Nbmp * 10); imshow(reshape((vi .* 255), 28, 28), [0 255]);
+            % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), 28, 28), [0 255]);
+        end
+    end
+end
 
-        %% Top RBM with label train
-                Ekt1  = (hk)' * wkt;       %1x2000
-                pkt1 = 1 ./ (1 + exp(-Ekt1));
-                Etot1 = hk * pkt1;
-                ht = gt(pkt1, rand)';       %2000x1
-          % end
-                Etk1  = (ht)' * (wkt)';
-                ptk1 = 1 ./ (1 + exp(-Etk1));
-                hk = gt(ptk1, rand)';
 
-                Ekt2  = (hk)' * wkt;
-                pkt2 = 1 ./ (1 + exp(-Ekt2));
-                Etot2 = hk * pkt2;
-                ht = gt(pkt2, rand)';    % will be used to train bp
+%% Top RBM with label train
+for c = 1:Nbmp
+    c
+    cc = ceil(rand*999);
+    if only2 == 1,
+        digit = 2;
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+    elseif only2 == 0,
+        digit = floor(rand*10);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+    end
+    A = double(imread(fname));
+    vi = reshape(A./255, 784, 1);
+    Ej = ((vi)' * (wij_w)')';
+    hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
+    Ek = ((hj)' * (wjk_w)')';
+    hk = gt((1 ./ (1 + exp(-Ek))), rand(nh2, 1));
+    Ekt1  = (hk)' * wkt;       %1x2000
+    pkt1 = 1 ./ (1 + exp(-Ekt1));
+    Etot1 = hk * pkt1;
+    ht = gt(pkt1, rand(1, nt))';       %2000x1
+% end
+    Etk1  = (ht)' * (wkt)';
+    ptk1 = 1 ./ (1 + exp(-Etk1));
+    hk = gt(ptk1, rand(1, nh2))';
 
-                Etk2  = (ht)' * (wkt)';      %E2 is 1x784
-                ptk2 = 1 ./ (1 + exp(-Etk2));
-                hk = gt(ptk2, rand)';
-          % change wij
-                wkt = wkt + etat*(Etot1-Etot2);
+    Ekt2  = (hk)' * wkt;
+    pkt2 = 1 ./ (1 + exp(-Ekt2));
+    Etot2 = hk * pkt2;
+    ht = gt(pkt2, rand(1, nt))';    % will be used to train bp
+
+    Etk2  = (ht)' * (wkt)';      %E2 is 1x784
+    ptk2 = 1 ./ (1 + exp(-Etk2));
+    hk = gt(ptk2, rand(1, nh2))';
+% change wij
+    wkt = wkt + etat*(Etot1-Etot2);
   %% simple
-  for ss = 1:10
-    sh = (ht)' * sw ./ nt;
-    sdi = zeros(1,nd*3);
-    sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
-    ser = sdi - sh;
-    sdelta = ht * ser;
-    sw = sw + etas .* sdelta;
-  end
+    for ss = 1:10
+      sh = (ht)' * sw ./ nt;
+      sdi = zeros(1,nd*3);
+      sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
+      ser = sdi - sh;
+      sdelta = ht * ser;
+      sw = sw + etas .* sdelta;
+    end
   %% bp
     bpdi = zeros(1, 10);
     bpdi(digit + 1) = 1;
@@ -129,16 +156,6 @@ for c = 1:Nbmp
 
     wi = wi + bpdelta_i .* etai;
     wj = wj + bpdelta_j .* etaj;
-
-  %%
-  end
-
-  if rem(c,(Nbmp/10)) == 0,
-      figure(2);title('during train')
-      subplot(2, 10, c/Nbmp * 10); imshow(A, [0 255]);
-      subplot(2, 10, 10 + c / Nbmp * 10); imshow(reshape((vi .* 255), 28, 28), [0 255]);
-      % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), 28, 28), [0 255]);
-  end
 end
 
 %% test
@@ -159,20 +176,20 @@ for tc = 1:t_times;
   B = double(imread(ftname));
   vt = reshape(B./255, 784, 1);
   pvtij = 1 ./ (1 + exp(-(vt)' * (wij_w)'));
-  vtj = gt(pvtij, rand)';
+  vtj = gt(pvtij, rand(1, nh1))';
   pvtjk = 1 ./ (1 + exp(-(vtj)'  * (wjk_w)'));
-  vtk = gt(pvtjk, rand)';
+  vtk = gt(pvtjk, rand(1, nh2))';
 
   Et1 =  (vtk)' * wkt;
   pt1 = 1 ./ (1 + exp(-Et1));
-  htt = gt(pt1, rand)';
+  htt = gt(pt1, rand(1, nt))';
   pt2 = 1 ./ (1 + exp(-(htt)'  * (wkt)'));
-  vtk_r = gt(pt2, rand)';
+  vtk_r = gt(pt2, rand(1, nh2))';
 
   pvtkj = 1 ./ (1 + exp(-(vtk_r)' * wjk_w));
-  vtj2 = gt(pvtkj, rand)';
+  vtj2 = gt(pvtkj, rand(1, nh1))';
   pvtji = 1 ./ (1 + exp(-(vtj2)' * wij_w));
-  vtr = gt(pvtji, rand)';
+  vtr = gt(pvtji, rand(1, nin))';
 
 %% bp
   [by bp] = max(1./(1+ exp(-(((htt)' * wi )* wj))));
