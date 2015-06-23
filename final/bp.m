@@ -1,8 +1,8 @@
-close all
+% close all
 clear all
 
 nin = 784;
-nh1 = 20;
+nh1 = 500;
 nh2 = 500;
 nt = 2000;
 nd = 10;
@@ -13,28 +13,25 @@ b2 = 0;
 b3 = 0;
 b4 = 0;
 %% parameters
-etaij = 0.5;
-etajl = 0.01;
-Nbmp = 1000;
+etaij = 0.01;
+etatl = 0.1;
+etajt = 0.01;
+Nbmp = 800;
 %% mode
 only2 = 0;
 loaddata = 0;
 
-wj_ini = importdata('~/GitHub/matlab/hw4/wj_ini.mat')
-wk_ini = importdata('~/GitHub/matlab/hw4/wk_ini.mat')
-wij_wi = ceil(wj_ini .* 10^ 3) ./ 10^ 3;
-wjl = ceil(wk_ini .* 10^ 3) ./ 10^ 3;
 
-
-
-% wij_wi = rand(nin, nh1) .* 0.2;
+wij_wi = rand(nin, nh1) .* 0.2;
 % wjk_wi = rand(nh1, nh2) - 0.5;
 % wkt = rand(nh2, nt) - 0.5;
-% wtl = rand(nt, nd) - 0.5;
+wtl = rand(nt, nd) - 0.5;
 
 %% temp
-% wjl = rand(nh1, nd) .* 0.2;
+wjt = rand(nh1, nt) .* 0.2;
 
+%%supervise
+er_all = zeros(nd, Nbmp);
 %% train
 for c = 1:Nbmp;
   c
@@ -55,24 +52,40 @@ for c = 1:Nbmp;
   vi = reshape(A./255, nin, 1);
   hj = ((vi)' * wij_wi)' ./ nin;
   hj_a = sigmoid(hj);
-  hl = ((hj_a)' * wjl)' ./ nh1;
+  ht = ((hj_a)' * wjt)' ./nh1 .* 10;
+  ht_a = sigmoid(ht);
+  hl = ((ht_a)' * wtl)' ./ nt .* 100;
   er = zeros(10, 1);
   er = di - hl;
+  er_all(:, c) = er;
 
-  delta_ij = vi * sum((wjl .* (dsigmoid(hj_a) * (er)'))');
-  delta_jl = hj_a * (er)';
+  delta_tl = ht_a * (er)';
+  delta_jt_temp = sum((wtl .* (dsigmoid(ht_a) * (er)'))');
+  delta_jt = hj_a * delta_jt_temp;
+  delta_ij = vi * sum((wjt .* (dsigmoid(hj_a) * delta_jt_temp))');
+
+  % delta_tl = ht_a * (er)';
+  % delta_kt_temp = sum((wtl .* (dsigmoid(ht_a) * (er)'))')
+  % delta_kt = hk_a * delta_kt_temp;
+  % delta_jk_temp = sum((wkt .* (dsigmoid(hk_a) * delta_kt_temp))')
+  % delta_jk = hj_a * delta_jk_temp;
+  % delta_ij = vi * sum(wjk .* (dsigmoid(hj_a) * delta_jk_temp)')
+
 
   wij_wi = wij_wi + delta_ij .* etaij;
-  wjl = wjl + delta_jl .* etajl;
-
+  wjt = wjt + delta_jt .* etajt;
+  wtl = wtl + delta_tl .* etatl;
 end
+
+figure(1)
+plot(1:Nbmp, sum(er_all.^2), 'r-');
 
 
 
 
 %% test
 Ntest = 100;
-confusion = zeros(100,100);
+confusion = zeros(10,10);
 for t = 1:Ntest
   tt = 999 - Ntest + t;
   for digit_t = 0:9
@@ -86,7 +99,7 @@ for t = 1:Ntest
     end
     B = double(imread(ftname));
     vt = reshape(B ./ 255, nin, 1);
-    hl_t = sigmoid((vt)' * wij_wi) * wjl;
+    hl_t = sigmoid(sigmoid((vt)' * wij_wi) * wjt) * wtl;
     [y, p] = max(hl_t);
     confusion(digit_t + 1, p) = confusion(digit_t + 1, p) + 1;
   end
