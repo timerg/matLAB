@@ -21,6 +21,8 @@ wkt = rand(nh2, nt) - 0.5;
 % bp
 wi = rand(nt, nbph);
 wj = rand(nbph, nd);
+% simple
+sw = rand(nt, nd*3);
 %% bias
 b0 = 0.1;
 b1 = 0.1;
@@ -32,7 +34,8 @@ etaa = 0.01;
 etat = 0.01;
 etai = 0.01;
 etaj = 0.01;
-Nbmp = 2000;
+etas = 0.1;
+Nbmp = 1000;
 tt = 0.5;
 
 % mode
@@ -44,12 +47,12 @@ for c = 1:Nbmp
     cc = ceil(rand*999);
     if only2 == 1,
         digit = 2;
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2 == 0,
         digit = floor(rand*10);
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
+        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
+        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
     end
     A = double(imread(fname));
     vi = reshape(A./255, 784, 1);
@@ -104,6 +107,15 @@ for c = 1:Nbmp
                 hk = gt(ptk2, rand)';
           % change wij
                 wkt = wkt + etat*(Etot1-Etot2);
+  %% simple
+  for ss = 1:10
+    sh = (ht)' * sw ./ nt;
+    sdi = zeros(1,nd*3);
+    sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
+    ser = sdi - sh;
+    sdelta = ht * ser;
+    sw = sw + etas .* sdelta;
+  end
   %% bp
     bpdi = zeros(1, 10);
     bpdi(digit + 1) = 1;
@@ -133,6 +145,7 @@ end
 t_times = 500;
 I = zeros(1, t_times);
 testresult = zeros(10, 10);
+testresult_s = 0;
 for tc = 1:t_times;
   tcc = floor(rand * 999);
   if only2,
@@ -141,8 +154,8 @@ for tc = 1:t_times;
     digit_t = floor(rand*10);
   end
   Iin(1, tc) = digit_t + 1;   %recording
-  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
-  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+  % ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
   B = double(imread(ftname));
   vt = reshape(B./255, 784, 1);
   pvtij = 1 ./ (1 + exp(-(vt)' * (wij_w)'));
@@ -162,10 +175,13 @@ for tc = 1:t_times;
   vtr = gt(pvtji, rand)';
 
 %% bp
-  [y p] = max(sigmoid((htt)' * wi )* wj);
-  testresult(p, (digit_t+1)) = testresult(p, (digit_t + 1)) + 1;
-  accuracy = sum(diag(testresult))/sum(sum(testresult)) * 100;
-
+  [by bp] = max(1./(1+ exp(-(((htt)' * wi )* wj))));
+  testresult(bp, (digit_t+1)) = testresult(bp, (digit_t + 1)) + 1;
+  accuracy_bp = sum(diag(testresult))/sum(sum(testresult)) * 100;
+%% simple
+  [sy sp] = max((htt)' * sw ./ nt);
+  testresult_s = testresult_s + max([((digit_t + 1)== sp) ((digit_t + 2)== sp) ((digit_t + 3)== sp)]);
+  accuracy_s = testresult_s/t_times * 100;
 
   % if out(digit_t + 1, 1) == 1,
   %   testresult(1, tc) = 1;
@@ -177,7 +193,8 @@ for tc = 1:t_times;
     subplot(2, 10, 10 + tc / (t_times / 10)); imshow(reshape((vtr .* 255), 28, 28), [0 255]);
   end
 end
-fprintf('accuracy = %2.1f%%\n', accuracy)
+fprintf('accuracy_bp = %2.1f%%\n', accuracy_bp)
+fprintf('accuracy_s = %2.1f%%\n', accuracy_s)
 %
 % fprintf('accuracy = %2.1f%%\n', 100 * sum(testresult) / t_times)
 %
