@@ -55,7 +55,6 @@ for c = 1:Nbmp;
   ht = hj_a * wjt ./nh1 .* 10;
   ht_a = sigmoid(ht);
   hl = ht_a * wtl ./ nt .* 100;
-  hl_a = sigmoid(hl);
   er = zeros(1, 10);
   er = di - hl;
 

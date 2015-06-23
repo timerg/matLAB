@@ -72,7 +72,10 @@ for ll = 0:Ntrain*al
         %
         % end
 
-        delta_ij = xj * sum((wk .* (dsigmoid(xk') * err))');
+        % delta_ij = repmat(xj, 1, 20) .* repmat(dsigmoid(xk), 784, 1) .* repmat(sum((wk .* repmat(err, 20, 1)), 2)',784 ,1 );
+        % delta_ij = xj * sum((wk .* (dsigmoid(xk') * err))');
+        delta_ij = xj * (wk * err' .* dsigmoid(xk'))';
+
         delta_jl = xk' * err;
 
         wj = wj + delta_ij .* etaj;
@@ -121,6 +124,11 @@ figure(2);
 plot(linspace(0,al,al+1),accuracy_all,'r-');
 figure(3);
 mesh(linspace(1,20,20),linspace(1,784,784),wj);
+figure(4)
+for f2 = 1:10;
+  subplot(2, 5, f2); imshow(reshape(wj(:,f2 * 20 / 10), 28, 28) .* 200, [-300 300]);
+end
+
 
 %%new test
 accuracy = zeros(1,10);
