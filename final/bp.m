@@ -14,7 +14,7 @@ b3 = 0;
 b4 = 0;
 %% parameters
 etaij = 0.01;
-etatl = 0.1;
+etatl = 0.005;
 etajt = 0.01;
 Nbmp = 800;
 %% mode
@@ -22,13 +22,13 @@ only2 = 0;
 loaddata = 0;
 
 
-wij_wi = rand(nin, nh1) .* 0.2;
+wij_wi = ceil(rand(nin, nh1) .* 1000) ./ 1000; wij_ini = wij_wi;
 % wjk_wi = rand(nh1, nh2) - 0.5;
 % wkt = rand(nh2, nt) - 0.5;
-wtl = rand(nt, nd) - 0.5;
+wtl = ceil(rand(nt, nd).* 1000) ./ 1000 ; wtl_ini = wtl;
 
 %% temp
-wjt = rand(nh1, nt) .* 0.2;
+wjt = ceil(rand(nh1, nt).*1000)./1000 .* 0.2; wjt_ini = wjt;
 
 %%supervise
 er_all = zeros(nd, Nbmp);
@@ -57,7 +57,6 @@ for c = 1:Nbmp;
   hl = ((ht_a)' * wtl)' ./ nt .* 100;
   er = zeros(10, 1);
   er = di - hl;
-  er_all(:, c) = er;
 
   delta_tl = ht_a * (er)';
   delta_jt_temp = sum((wtl .* (dsigmoid(ht_a) * (er)'))');
@@ -75,10 +74,24 @@ for c = 1:Nbmp;
   wij_wi = wij_wi + delta_ij .* etaij;
   wjt = wjt + delta_jt .* etajt;
   wtl = wtl + delta_tl .* etatl;
+
+%% supervise
+  er_all(:, c) = er;
+  wij_all(:, :, c) = wij_wi;
+  wjt_all(:, :, c) = wjt;
+  wtl_all(:, :, c) = wtl;
 end
 
 figure(1)
-plot(1:Nbmp, sum(er_all.^2), 'r-');
+subplot(2, 2, 1);plot(1:Nbmp, sum(er_all.^2), 'r-');
+subplot(2, 2, 2);plot(1:Nbmp, reshape(sum(sum(wij_all.^2)), Nbmp, 1), 'b-');ylabel('wij');
+subplot(2, 2, 3);plot(1:Nbmp, reshape(sum(sum(wjt_all.^2)), Nbmp, 1), 'c-');ylabel('wjt');
+subplot(2, 2, 4);plot(1:Nbmp, reshape(sum(sum(wtl_all.^2)), Nbmp, 1), 'd-');ylabel('wtl');
+
+figure(2)
+for f2 = 1:10;
+  subplot(2, 5, f2); imshow(reshape(wij_wi(:,f2 * nh1 / 10), 28, 28) .* 200, [0 1000]);
+end
 
 
 
@@ -107,3 +120,24 @@ end
 
 accuracy = 100*sum(diag(confusion))/sum(sum(confusion));
 fprintf('Total Accuracy = %2.1f%%\n',accuracy);
+
+
+
+
+% accuracy = zeros(1,10);
+%         confusion = zeros(10,10);
+%         Fin_val = zeros(100,10);
+%         for CL = 1:10
+%             for c = 800:999;
+%                 dist = zeros(1,10);
+%                 fnamet = sprintf('digit_%1d_%03d.bmp', CL-1, c);
+%                 % A = double(imread(['/Users/timer/OneDrive/ms1_2/neuralnetwork/hw5/test_data_new/' fnamet]))./255;
+%                 B = double(imread(['~/OneDrive/ms1_2/neuralnetwork/hw5/test_data_new/' fnamet]))./255;
+%                 dist = (reshape(B,784,1)'*wij_wi*wjt*wtl);
+%                 [y,indmin] = max(dist);
+%                 confusion(CL,indmin) = confusion(CL,indmin)+1;
+%                 Fin_val(c-699,CL) = y;
+%             end
+%         end
+% accuracy = 100*sum(diag(confusion))/sum(sum(confusion));
+% fprintf('Total Accuracy = %2.1f%%\n',accuracy);
