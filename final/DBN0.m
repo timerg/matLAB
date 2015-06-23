@@ -146,7 +146,7 @@ end
 %% test
 t_times = 500;
 I = zeros(1, t_times);
-testresult = zeros(1, t_times);
+testresult = zeros(10, 10);
 for tc = 1:t_times;
   tcc = floor(rand * 999);
   if only2,
@@ -174,6 +174,12 @@ for tc = 1:t_times;
   vtj2 = gt(pvtkj, rand)';
   pvtji = 1 ./ (1 + exp(-(vtj2)' * wij_w));
   vtr = gt(pvtji, rand)';
+
+%% bp
+  [y p] = max(sigmoid((htt)' * wi )* wj);
+  testresult(p, (digit_t+1)) = testresult(p, (digit_t + 1)) + 1;
+  accuracy = sum(diag(testresult))/sum(sum(testresult)) * 100;
+  fprintf('accuracy = %2.1f%%\n', accuracy)
 
   % if out(digit_t + 1, 1) == 1,
   %   testresult(1, tc) = 1;
