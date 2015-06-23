@@ -84,11 +84,6 @@ for ll = 0:Ntrain*al
 
 
 
-
-
-
-
-
          if mod(ll,Ntrain)==0
 
         %% testing

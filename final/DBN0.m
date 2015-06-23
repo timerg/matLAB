@@ -9,7 +9,7 @@ nh2 = 500;
 nt = 2000;
 nd = 10;
 nin = 784;
-nbph = 50;
+nbph = 100;
 
 %% weight
 wij_r = rand(nin, nh1) - 0.5;
@@ -22,16 +22,17 @@ wkt = rand(nh2, nt) - 0.5;
 wi = rand(nt, nbph);
 wj = rand(nbph, nd);
 %% bias
-b0 = 0;
-b1 = 0;
-b2 = 0;
-b3 = 0;
-b4 = 0;
+b0 = 0.1;
+b1 = 0.1;
+b2 = 0.1;
+b3 = 0.1;
+b4 = 0.1;
 %% parameters
 etaa = 0.01;
+etat = 0.001
 etai = 0.01;
 etaj = 0.01;
-Nbmp = 20000;
+Nbmp = 2000;
 tt = 0.5;
 
 % mode
@@ -56,17 +57,9 @@ for c = 1:Nbmp
     for aa = 1: 1
 % wake phase
         Ej = ((vi)' * wij_r)';
-        if rr,
-          hj = gt((1 ./ (1 + exp(-Ej))), rand);
-        else
-          hj = gt((1 ./ (1 + exp(-Ej))), tt);         %200x1
-        end
+        hj = gt((1 ./ (1 + exp(-Ej))), rand);
         Ek = ((hj)' * wjk_r)';
-        if rr,
-          hk = gt((1 ./ (1 + exp(-Ek))), rand);
-        else
-          hk = gt((1 ./ (1 + exp(-Ek))), tt);         %50x1
-        end
+        hk = gt((1 ./ (1 + exp(-Ek))), rand);
 
         %%
         E_w1  = (hk)' * wjk_w;           %1x200
@@ -78,17 +71,10 @@ for c = 1:Nbmp
         wij_w = wij_w + etaa .* hj * ((vi)' - p2);
   % sleep phase
         Ej = ((hk)' * wjk_w)';
-        if rr,
-          hj = gt((1 ./ (1 + exp(-Ej))), rand);
-        else
-          hj = gt((1 ./ (1 + exp(-Ej))), tt);
-        end
+        hj = gt((1 ./ (1 + exp(-Ej))), rand);
         Ei = ((hj)' * wij_w)';
-        if rr,
-          vi = gt((1 ./ (1 + exp(-Ei))), rand);
-        else
-          vi = gt((1 ./ (1 + exp(-Ei))), tt);
-        end
+        vi = gt((1 ./ (1 + exp(-Ei))), rand);
+
 
         E_s1  = (vi)' * wij_r;
         p3 = 1 ./ (1 + exp(-b3-E_s1));
@@ -117,14 +103,14 @@ for c = 1:Nbmp
                 ptk2 = 1 ./ (1 + exp(-Etk2));
                 hkl = gt(ptk2, rand)';
           % change wij
-                wkt = wkt + etaa*(Etot1-Etot2);
+                wkt = wkt + etat*(Etot1-Etot2);
   %% bp
     bpdi = zeros(1, 10);
     bpdi(digit + 1) = 1;
     bpv = (ht)';       % 1x2000
-    bph = bpv * wi;    % 1x50
+    bph = bpv * wi ./nbph;    % 1x50
     bphs = sigmoid(bph);
-    bpy = bphs * wj;   %1x10
+    bpy = bphs * wj ./ nd;   %1x10
     bper = bpdi - bpy;
     bpdelta_i = (bpv)' * (wj * bper' .* dsigmoid(bphs'))';
     bpdelta_j = bphs' * bper;
@@ -179,7 +165,7 @@ for tc = 1:t_times;
   [y p] = max(sigmoid((htt)' * wi )* wj);
   testresult(p, (digit_t+1)) = testresult(p, (digit_t + 1)) + 1;
   accuracy = sum(diag(testresult))/sum(sum(testresult)) * 100;
-  fprintf('accuracy = %2.1f%%\n', accuracy)
+
 
   % if out(digit_t + 1, 1) == 1,
   %   testresult(1, tc) = 1;
@@ -191,6 +177,7 @@ for tc = 1:t_times;
     subplot(2, 10, 10 + tc / (t_times / 10)); imshow(reshape((vtr .* 255), 28, 28), [0 255]);
   end
 end
+fprintf('accuracy = %2.1f%%\n', accuracy)
 %
 % fprintf('accuracy = %2.1f%%\n', 100 * sum(testresult) / t_times)
 %
