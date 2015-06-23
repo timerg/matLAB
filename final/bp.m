@@ -66,6 +66,7 @@ for c = 1:Nbmp;
 
   delta_ij = (vi)' * ((wjt * (wtl * er' .* dsigmoid(ht_a')))' .* dsigmoid(hj_a));
 
+delta_ij = (vi)' * sum(er.* ((sum(wjt) .* dsigmoid(ht_a)) * wtl));
 
 
   % delta_tl = ht_a * (er)';
