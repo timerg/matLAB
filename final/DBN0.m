@@ -127,10 +127,10 @@ for c = 1:Nbmp
     bpy = bphs * wj;   %1x10
     bper = bpdi - bpy;
     bpdelta_i = (bpv)' * (wj * bper' .* dsigmoid(bphs'))';
-    delta_j = bphs' * bper;
+    bpdelta_j = bphs' * bper;
 
-    wi = wi + delta_i .* etai;
-    wj = wj + delta_j .* etaj;
+    wi = wi + bpdelta_i .* etai;
+    wj = wj + bpdelta_j .* etaj;
 
   %%
   end
