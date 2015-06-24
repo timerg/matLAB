@@ -4,16 +4,16 @@ close all;
 
 
 
-nh1 = 784;
-nh2 = 784;
-nt = 784;
+nh1 = 500;
+nh2 = 700;
+nt = 2000;
 nd = 10;
 nin = 784;
 nbph = 100;
 
 %% weight
-wij_w = roundn((rand(nin, nh1) - 0.5), -3);
-wjk_w = roundn((rand(nh1, nh2) - 0.5), -3);
+wij_w = roundn((rand(nin, nh1) - 0.5), -2);
+wjk_w = roundn((rand(nh1, nh2) - 0.5), -2);
 % Top RBM weoghts
 wkt = rand(nh2, nt) - 0.5;
 % bp
@@ -32,8 +32,8 @@ etaa = 0.1;
 etat = 0.1;
 etai = 0.01;
 etaj = 0.01;
-etas = 0.1;
-Nbmp = 200;
+etas = 0.5;
+Nbmp = 5000;
 tt = 0.5;
 
 % mode
@@ -305,7 +305,7 @@ for c = 1:Nbmp
         Etf  = (hk)' * wkt;       %1x2000
         pktf = 1 ./ (1 + exp(-Etf));
         ht = gt(pktf, rand(1, nt))';
-        for ss = 1:10
+        for ss = 1:1
             sh = (ht)' * sw ./ nt;
             sdi = zeros(1,nd*3);
             sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
@@ -376,16 +376,12 @@ for tc = 1:t_times;
   testresult_s = testresult_s + max([((digit_t + 1)== sp) ((digit_t + 2)== sp) ((digit_t + 3)== sp)]);
   accuracy_s = testresult_s/t_times * 100;
 
-  if out(digit_t + 1, 1) == 1,
-    testresult(1, tc) = 1;
-  end
-  [M, I(1, tc)] = max(out);
   if mod(tc, (t_times / 10)) == 0,
     figure(3)
     subplot(4, 10, tc / (t_times / 10)); imshow(B, [0 255]);
     subplot(4, 10, 10 + tc / (t_times / 10)); imshow(reshape((vtr .* 255), 28, 28), [0 255]);
     subplot(4, 10, 20 + tc / (t_times / 10)); imshow(reshape((vtr2 .* 255), 28, 28), [0 255]);
-    % subplot(4, 10, 30 + tc / (t_times / 10)); imshow(reshape((vtr3 .* 255), 28, 28), [0 255]);
+    subplot(4, 10, 30 + tc / (t_times / 10)); imshow(reshape((vtr3 .* 255), 28, 28), [0 255]);
   end
 end
 % fprintf('accuracy_bp = %2.1f%%\n', accuracy_bp)
