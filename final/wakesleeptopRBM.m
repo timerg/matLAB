@@ -5,17 +5,17 @@ close all;
 
 
 nh1 = 500;
-nh2 = 500;
+nh2 = 700;
 nt = 2000;
 nd = 10;
 nin = 784;
 nbph = 100;
 
 %% weight
-wij_r = rand(nin, nh1) - 0.5;
-wij_w = rand(nh1, nin) - 0.5;
-wjk_r = rand(nh1, nh2) - 0.5;
-wjk_w = rand(nh2, nh1) - 0.5;
+wij_r = roundn((rand(nin, nh1) - 0.5), -4);
+wij_w = roundn((rand(nh1, nin) - 0.5), -4);
+wjk_r = roundn((rand(nh1, nh2) - 0.5), -4);
+wjk_w = roundn((rand(nh2, nh1) - 0.5), -4);
 % Top RBM weoghts
 wkt = rand(nh2, nt) - 0.5;
 % bp
@@ -24,14 +24,14 @@ wj = rand(nbph, nd);
 % simple
 sw = rand(nt, nd*3);
 %% bias
-b0 = 0.1;
-b1 = 0.1;
-b2 = 0.1;
-b3 = 0.1;
-b4 = 0.1;
+b0 = 0;
+b1 = 0;
+b2 = 0;
+b3 = 0;
+b4 = 0;
 %% parameters
-etaa = 0.01;
-etat = 0.01;
+etaa = 0.001;
+etat = 0.1;
 etai = 0.01;
 etaj = 0.01;
 etas = 0.1;
@@ -47,61 +47,6 @@ for c = 1:Nbmp
     cc = ceil(rand*999);
     if only2 == 1,
         digit = 2;
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
-    elseif only2 == 0,
-        digit = floor(rand*10);
-        fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
-        % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
-    end
-    A = double(imread(fname));
-    vi = reshape(A./255, 784, 1);
-
-    for aa = 1: 1
-% wake phase
-        Ej = ((vi)' * wij_r)';
-        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
-        Ek = ((hj)' * wjk_r)';
-        hk = gt((1 ./ (1 + exp(-Ek))), rand(nh2, 1));
-
-        %%
-        E_w1  = (hk)' * wjk_w;           %1x200
-        p1 = 1 ./ (1 + exp(-b1 - E_w1));        %200x1
-        wjk_w = wjk_w + etaa .* hk * ((hj)' - p1);
-
-        E_w2  = (hj)' * wij_w;           %1x200
-        p2 = 1 ./ (1 + exp(-b2 - E_w2));        %200x1
-        wij_w = wij_w + etaa .* hj * ((vi)' - p2);
-  % sleep phase
-        Ej = ((hk)' * wjk_w)';
-        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh2, 1));
-        Ei = ((hj)' * wij_w)';
-        vi = gt((1 ./ (1 + exp(-Ei))), rand(nin, 1));
-
-
-        E_s1  = (vi)' * wij_r;
-        p3 = 1 ./ (1 + exp(-b3-E_s1));
-        wij_r = wij_r + etaa .* vi * ((hj)' - p3);
-
-        E_s2  = (hj)' * wjk_r;      %E2 is 1x784
-        p4 = 1 ./ (1 + exp(-E_s2));
-        wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
-        if rem(c,(Nbmp/10)) == 0,
-            figure(2);title('during train')
-            subplot(2, 10, c/Nbmp * 10); imshow(A, [0 255]);
-            subplot(2, 10, 10 + c / Nbmp * 10); imshow(reshape((vi .* 255), 28, 28), [0 255]);
-            % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), 28, 28), [0 255]);
-        end
-    end
-end
-
-
-%% Top RBM with label train
-for c = 1:Nbmp
-    c
-    cc = ceil(rand*999);
-    if only2 == 1,
-        digit = 2;
         % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
         fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
     elseif only2 == 0,
@@ -111,52 +56,95 @@ for c = 1:Nbmp
     end
     A = double(imread(fname));
     vi = reshape(A./255, 784, 1);
-    Ej = ((vi)' * (wij_w)')';
-    hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
-    Ek = ((hj)' * (wjk_w)')';
-    hk = gt((1 ./ (1 + exp(-Ek))), rand(nh2, 1));
-    Ekt1  = (hk)' * wkt;       %1x2000
-    pkt1 = 1 ./ (1 + exp(-Ekt1));
+
+    for aa = 1: 1
+% wake phase
+        Ej = ((vi)' * wij_r)';
+        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
+        Ek = ((hj)' * wjk_r)';
+        hk = gt((1 ./ (1 + exp(-Ek))), rand(nh2, 1));   % 500x1
+
+        %%
+        E_w1  = (hk)' * wjk_w;           %1x200
+        p1 = 1 ./ (1 + exp(-b1 - E_w1));        %200x1
+        wjk_w = wjk_w + etaa .* hk * ((hj)' - p1);
+
+        E_w2  = (hj)' * wij_w;           %1x200
+        p2 = 1 ./ (1 + exp(-b2 - E_w2));        %200x1
+        wij_w = wij_w + etaa .* hj * ((vi)' - p2);
+
+    %% Top RBM with label train
+        Ekt1  = (hk)' * wkt;       %1x2000
+        pkt1 = 1 ./ (1 + exp(-Ekt1));
     Etot1 = hk * pkt1;
-    ht = gt(pkt1, rand(1, nt))';       %2000x1
-% end
-    Etk1  = (ht)' * (wkt)';
-    ptk1 = 1 ./ (1 + exp(-Etk1));
-    hk = gt(ptk1, rand(1, nh2))';
-
-    Ekt2  = (hk)' * wkt;
-    pkt2 = 1 ./ (1 + exp(-Ekt2));
+        ht = gt(pkt1, rand(1, nt))';       %2000x1
+        Etk1  = (ht)' * (wkt)';
+        ptk1 = 1 ./ (1 + exp(-Etk1));
+        hk = gt(ptk1, rand(1, nh2))';
+    %Top RBM 2 nd round
+        Ekt2  = (hk)' * wkt;
+        pkt2 = 1 ./ (1 + exp(-Ekt2));
     Etot2 = hk * pkt2;
-    ht = gt(pkt2, rand(1, nt))';    % will be used to train bp
+        ht = gt(pkt2, rand(1, nt))';    % will be used to train bp
+        % change wij
+        wkt = wkt + etat*(Etot1-Etot2);
 
-    Etk2  = (ht)' * (wkt)';      %E2 is 1x784
-    ptk2 = 1 ./ (1 + exp(-Etk2));
-    hk = gt(ptk2, rand(1, nh2))';
-% change wij
-    wkt = wkt + etat*(Etot1-Etot2);
-  %% simple
-    for ss = 1:10
-      sh = (ht)' * sw ./ nt;
-      sdi = zeros(1,nd*3);
-      sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
-      ser = sdi - sh;
-      sdelta = ht * ser;
-      sw = sw + etas .* sdelta;
+        Ekt1  = (hk)' * wkt;       %1x2000
+        pkt1 = 1 ./ (1 + exp(-Ekt1));
+        ht = gt(pkt1, rand(1, nt))';       %2000x1
+        Etk1  = (ht)' * (wkt)';
+        ptk1 = 1 ./ (1 + exp(-Etk1));
+        hk = gt(ptk1, rand(1, nh2))';
+
+
+  % sleep phase
+        Ej = ((hk)' * wjk_w)';
+        hj = gt((1 ./ (1 + exp(-Ej))), rand(nh1, 1));
+        Ei = ((hj)' * wij_w)';
+        vi = gt((1 ./ (1 + exp(-Ei))), rand(nin, 1));
+
+
+        E_s1  = (vi)' * wij_r;
+        p3 = 1 ./ (1 + exp(-b3-E_s1));
+        wij_r = wij_r + etaa .* vi * ((hj)' - p3);
+
+        E_s2  = (hj)' * wjk_r;      %E2 is 1x784
+        p4 = 1 ./ (1 + exp(-b4-E_s2));
+        wjk_r = wjk_r + etaa .* hj * ((hk)' - p4);
+
+
+          %% simple
+            for ss = 1:10
+              sh = (ht)' * sw ./ nt;
+              sdi = zeros(1,nd*3);
+              sdi(digit * 3 +1: digit * 3 +1 +2) = 10;
+              ser = sdi - sh;
+              sdelta = ht * ser;
+              sw = sw + etas .* sdelta;
+            end
+          %% bp
+            bpdi = zeros(1, 10);
+            bpdi(digit + 1) = 1;
+            bpv = (ht)';       % 1x2000
+            bph = bpv * wi ./nbph;    % 1x50
+            bphs = sigmoid(bph);
+            bpy = bphs * wj ./ nd;   %1x10
+            bper = bpdi - bpy;
+            bpdelta_i = (bpv)' * (wj * bper' .* dsigmoid(bphs'))';
+            bpdelta_j = bphs' * bper;
+
+            wi = wi + bpdelta_i .* etai;
+            wj = wj + bpdelta_j .* etaj;
+
+        if rem(c,(Nbmp/10)) == 0,
+            figure(2);title('during train')
+            subplot(2, 10, c/Nbmp * 10); imshow(A, [0 255]);
+            subplot(2, 10, 10 + c / Nbmp * 10); imshow(reshape((vi .* 255), 28, 28), [0 255]);
+            % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), 28, 28), [0 255]);
+        end
     end
-  %% bp
-    bpdi = zeros(1, 10);
-    bpdi(digit + 1) = 1;
-    bpv = (ht)';       % 1x2000
-    bph = bpv * wi ./nbph;    % 1x50
-    bphs = sigmoid(bph);
-    bpy = bphs * wj ./ nd;   %1x10
-    bper = bpdi - bpy;
-    bpdelta_i = (bpv)' * (wj * bper' .* dsigmoid(bphs'))';
-    bpdelta_j = bphs' * bper;
-
-    wi = wi + bpdelta_i .* etai;
-    wj = wj + bpdelta_j .* etaj;
 end
+
 
 %% test
 t_times = 500;
@@ -187,8 +175,8 @@ for tc = 1:t_times;
   vtk_r = gt(pt2, rand(1, nh2))';
 
   pvtkj = 1 ./ (1 + exp(-(vtk_r)' * wjk_w));
-  vtj2 = gt(pvtkj, rand(1, nh1))';
-  pvtji = 1 ./ (1 + exp(-(vtj2)' * wij_w));
+  vtj_r = gt(pvtkj, rand(1, nh1))';
+  pvtji = 1 ./ (1 + exp(-(vtj_r)' * wij_w));
   vtr = gt(pvtji, rand(1, nin))';
 
 %% bp
