@@ -8,12 +8,12 @@ nh1 = 500;
 nh2 = 700;
 nt = 2000;
 nd = 10;
-nin = 784;
+nin = 1024;
 nbph = 100;
 
 %% weight
-wij_w = roundn((rand(nin, nh1) - 0.5), -3);
-wjk_w = roundn((rand(nh1, nh2) - 0.5), -3);
+wij_w = ceil((rand(nin, nh1) - 0.5) .* 1000)./1000;
+wjk_w = ceil((rand(nh1, nh2) - 0.5) .* 1000)./1000;
 % Top RBM weoghts
 wkt = rand(nh2, nt) - 0.5;
 % bp
@@ -27,53 +27,65 @@ b1 = 0;
 b2 = 0;
 b3 = 0;
 b4 = 0;
+
 %% parameters
-etaa = 0.01;
-etat = 0.1;
+etaa = 1;
+etat = 1;
 etai = 0.01;
 etaj = 0.01;
 etas = 0.1;
-Nbmp = 200;
+Nbmp = 100;
 tt = 0.5;
-
+picnum = 82;
 % mode
 only2 = 0;
 rr = 1;
 % train
 for c = 1:Nbmp
   c
-    cc = ceil(rand*999);
-    if only2 == 1,
-        digit = 2;
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw6/2_train/digit_2_%03d.bmp',cc);   %for windows
-    elseif only2 == 0,
-        digit = floor(rand*10);
-        % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',digit,cc-1);
-        fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp',floor(rand*10),cc);
-    end
-    A = double(imread(fname));
-    vi = reshape(A./255, 784, 1);
-    vi_origin = vi;
-
+  cc = ceil(rand*picnum);
+  fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
+  % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
+  A = double(imread(fname));
+  vi = reshape(A./255, nin, 1);
     for aa = 1: 1
+        dev = std(vi);
+        bi_a = mean(vi) - 0.5;
+        bi_b = bi_a - 0.5
 %%% wij
         %% 1st froward
-                Ejf = (vi_origin)' * wij_w;
+        % Ejf_a = sum((vi - bi_a).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf_b = sum((vi - bi_b).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf_c = sum((vi - bi_c).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf_d = sum((vi - bi_d).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf_e = sum((vi - bi_e).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf_f = sum((vi - bi_f).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
+        % Ejf = sum([Ejf_a;Ejf_b;Ejf_c;Ejf_d;Ejf_e;Ejf_f])
+        Ejf = (vi)' * wij_w./ dev + bi_a
                 pijf = 1 ./ (1 + exp(-Ejf));
                 hj = gt(pijf, rand(1, nh1))';
                 Etotij = vi * pijf;
 
                 Ejr  = (hj)' * (wij_w)';           %
                 pjir = 1 ./ (1 + exp(-Ejr));        %
-                vi_1 = gt(pjir, rand(1, nin))';
+                vi_1 = (pjir)';
         %% 2nd forward
-                Ejf = (vi_1)' * wij_w;
-                pijf = 1 ./ (1 + exp(-Ejf));
-                hj = gt(pijf, rand(1, nh1))';
-                Etotij2 = vi_1 * pijf;
-
+        dev = std(vi_1);
+        bi = mean(vi_1);
+        Ejf2_a = sum((vi_1 - bi_a).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2_b = sum((vi_1 - bi_b).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2_c = sum((vi_1 - bi_c).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2_d = sum((vi_1 - bi_d).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2_e = sum((vi_1 - bi_e).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2_f = sum((vi_1 - bi_f).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        Ejf2 = sum([Ejf2_a;Ejf2_b;Ejf2_c;Ejf2_d;Ejf2_e;Ejf2_f]);
+                % Ejf = (vi_1)' * wij_w;
+                pijf2 = 1 ./ (1 + exp(-Ejf2));
+                hj2 = gt(pijf2, rand(1, nh1))';
+                Etotij2 = vi_1 * pijf2;
         wij_w = wij_w + etaa .* (Etotij - Etotij2);
+
+
 % %% weight jk
 %         %% 1st froward
 %                 Ejf = (vi_origin)' * wij_w;
@@ -189,75 +201,55 @@ for c = 1:Nbmp
 
         if rem(c,(Nbmp/10)) == 0,
             figure(2);title('during train')
-            subplot(4, 10, c/Nbmp * 10); imshow(reshape((vi_origin .* 255), 28, 28), [0 255]);
-            subplot(4, 10, 10 + c / Nbmp * 10); imshow(reshape((vi_1 .* 255), 28, 28), [0 255]);
-            % subplot(4, 10, 20 + c / Nbmp * 10); imshow(reshape((vi_2 .* 255), 28, 28), [0 255]);
-            % subplot(4, 10, 30 + c / Nbmp * 10); imshow(reshape((vi_3 .* 255), 28, 28), [0 255]);
-            % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), 28, 28), [0 255]);
+            subplot(4, 10, c/Nbmp * 10); imshow(reshape((vi .* 255), sqrt(nin), sqrt(nin)), [0 255]);
+            subplot(4, 10, 10 + c / Nbmp * 10); imshow(reshape((vi_1 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
+            % subplot(4, 10, 20 + c / Nbmp * 10); imshow(reshape((vi_2 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
+            % subplot(4, 10, 30 + c / Nbmp * 10); imshow(reshape((vi_3 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
+            % subplot(3, 10, 20 + c / Nbmp * 10); imshow(reshape((wij_w(1,:) .* 255), sqrt(nin), sqrt(nin)), [0 255]);
         end
     end
 end
 
 
 %% test
-t_times = 500;
-I = zeros(1, t_times);
-testresult = zeros(10, 10);
-testresult_s = 0;
-for tc = 1:t_times;
-  tcc = floor(rand * 999);
-  if only2,
-    digit_t = 2;
-  else
-    digit_t = floor(rand*10);
-  end
-  Iin(1, tc) = digit_t + 1;   %recording
-  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
-  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/hw4/data/digit_%1d_%03d.bmp', digit_t, tcc);
+% testresult_s = 0;
+testnum = 10;
+for tc = 1:testnum;
+  ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
+  % ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
   B = double(imread(ftname));
-  vt = reshape(B./255, 784, 1);
+  vtt = reshape(B./255, nin, 1);
+  devt = std(vtt);
+  bit = mean(vtt);
+  Ejf = sum((vtt - bi).^2 ./ dev^2) - (vtt)' * wij_w ./ dev;
+  % Ejf = (vi_origin)' * wij_w;
+  pijf = 1 ./ (1 + exp(-Ejf));
+  hj = gt(pijf, rand(1, nh1))';
+  Etotij = vtt * pijf;
 
-  Etij = (vt)' * wij_w;
-      pvtij = 1 ./ (1 + exp(-Etij));
-      vtj = gt(pvtij, rand(1, nh1))';
-  Etji = (vtj)' * (wij_w)';
-      pvtji = 1 ./ (1 + exp(-Etji));
-      vtr = gt(pvtji, rand(1, nin))';
+  Ejr  = (hj)' * (wij_w)';           %
+  pjir = 1 ./ (1 + exp(-Ejr));        %
+  vti_1 = (pjir)';
 
-  % Etkj2 = (vtk)' * (wjk_w)';
-  %     pvtkj2 = 1 ./ (1 + exp(-Etkj2));
-  %     vtj_r2 = gt(pvtkj2, rand(1, nh1))';
-  % Etji2 = (vtj_r)' * (wij_w)';
-  %     pvtji2 = 1 ./ (1 + exp(-Etji2));
-  %     vtr2 = gt(pvtji2, rand(1, nin))';
-  %
-  % Etji3 = (vtj)' * (wij_w)';
-  %     pvtji3 = 1 ./ (1 + exp(-Etji3));
-  %     vtr3 = gt(pvtji3, rand(1, nin))';
 
-%% bp
-%   [by bp] = max(1./(1+ exp(-(((htt)' * wi )* wj))));
-%   testresult(bp, (digit_t+1)) = testresult(bp, (digit_t + 1)) + 1;
-%   accuracy_bp = sum(diag(testresult))/sum(sum(testresult)) * 100;
-% %% simple
-%   [sy sp] = max((htt)' * sw ./ nt);
-%   testresult_s = testresult_s + max([((digit_t + 1)== sp) ((digit_t + 2)== sp) ((digit_t + 3)== sp)]);
-%   accuracy_s = testresult_s/t_times * 100;
-
-  % if out(digit_t + 1, 1) == 1,
-  %   testresult(1, tc) = 1;
-  % end
-  % [M, I(1, tc)] = max(out);
-  if mod(tc, (t_times / 10)) == 0,
+%
+% % %% simple
+% %   [sy sp] = max((htt)' * sw ./ nt);
+% %   testresult_s = testresult_s + max([((digit_t + 1)== sp) ((digit_t + 2)== sp) ((digit_t + 3)== sp)]);
+% %   accuracy_s = testresult_s/t_times * 100;
+%
+%   % if out(digit_t + 1, 1) == 1,
+%   %   testresult(1, tc) = 1;
+%   % end
+%   % [M, I(1, tc)] = max(out);
+  if mod(tc, (testnum / 10)) == 0,
     figure(3)
-    subplot(4, 10, tc / (t_times / 10)); imshow(B, [0 255]);
-    subplot(4, 10, 10 + tc / (t_times / 10)); imshow(reshape((vtr .* 255), 28, 28), [0 255]);
-    % subplot(4, 10, 20 + tc / (t_times / 10)); imshow(reshape((vtr2 .* 255), 28, 28), [0 255]);
-    % subplot(4, 10, 30 + tc / (t_times / 10)); imshow(reshape((vtr3 .* 255), 28, 28), [0 255]);
+    subplot(2, 10, tc / (testnum / 10)); imshow(B, [0 255]);
+    subplot(2, 10, 10 + tc / (testnum / 10)); imshow(reshape((vti_1 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
   end
 end
-fprintf('accuracy_bp = %2.1f%%\n', accuracy_bp)
-fprintf('accuracy_s = %2.1f%%\n', accuracy_s)
+% fprintf('accuracy_bp = %2.1f%%\n', accuracy_bp)
+% fprintf('accuracy_s = %2.1f%%\n', accuracy_s)
 %
 % fprintf('accuracy = %2.1f%%\n', 100 * sum(testresult) / t_times)
 %
