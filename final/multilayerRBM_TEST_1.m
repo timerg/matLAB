@@ -4,7 +4,7 @@ close all;
 
 
 
-nh1 = 500;
+nh1 = 20;
 nh2 = 700;
 nt = 2000;
 nd = 10;
@@ -23,18 +23,18 @@ wj = rand(nbph, nd);
 sw = rand(nt, nd*3);
 %% bias
 b0 = 0;
-b1 = 0;
+b1 = -5;
 b2 = 0;
 b3 = 0;
 b4 = 0;
 
 %% parameters
-etaa = 1;
-etat = 1;
+etaa = 0.1;
+etat = 0.1;
 etai = 0.01;
 etaj = 0.01;
 etas = 0.1;
-Nbmp = 100;
+Nbmp = 1000;
 tt = 0.5;
 picnum = 82;
 % mode
@@ -44,14 +44,15 @@ rr = 1;
 for c = 1:Nbmp
   c
   cc = ceil(rand*picnum);
-  fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
-  % fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
+  % fname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
+  fname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/H%01d.bmp',cc);
   A = double(imread(fname));
   vi = reshape(A./255, nin, 1);
     for aa = 1: 1
         dev = std(vi);
+        bi = mean(vi);
         bi_a = mean(vi) - 0.5;
-        bi_b = bi_a - 0.5
+        bi_b = bi_a - 0.5;
 %%% wij
         %% 1st froward
         % Ejf_a = sum((vi - bi_a).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
@@ -61,24 +62,29 @@ for c = 1:Nbmp
         % Ejf_e = sum((vi - bi_e).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
         % Ejf_f = sum((vi - bi_f).^2 ./ 2 /dev^2) - (vi)' * wij_w ./ dev;
         % Ejf = sum([Ejf_a;Ejf_b;Ejf_c;Ejf_d;Ejf_e;Ejf_f])
-        Ejf = (vi)' * wij_w./ dev + bi_a
+        % Ejf = (vi)' * wij_w + randi([0, ceil(dev)], 1, nh1) + bi;
+        Ejf = sum((vi - bi).^2 ./ 2/ (dev^2)) - (vi)' * wij_w ./ dev;
                 pijf = 1 ./ (1 + exp(-Ejf));
                 hj = gt(pijf, rand(1, nh1))';
+                % hj = max(0, -mean(Ejf) + Ejf + randi([0, ceil(dev)]))';
                 Etotij = vi * pijf;
 
-                Ejr  = (hj)' * (wij_w)';           %
+                % Ejr  = log(1+ exp((hj)' * (wij_w)'));
+                Ejr =  (hj)' * (wij_w)';
                 pjir = 1 ./ (1 + exp(-Ejr));        %
                 vi_1 = (pjir)';
         %% 2nd forward
         dev = std(vi_1);
         bi = mean(vi_1);
-        Ejf2_a = sum((vi_1 - bi_a).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2_b = sum((vi_1 - bi_b).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2_c = sum((vi_1 - bi_c).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2_d = sum((vi_1 - bi_d).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2_e = sum((vi_1 - bi_e).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2_f = sum((vi_1 - bi_f).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
-        Ejf2 = sum([Ejf2_a;Ejf2_b;Ejf2_c;Ejf2_d;Ejf2_e;Ejf2_f]);
+        % Ejf2_a = sum((vi_1 - bi_a).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2_b = sum((vi_1 - bi_b).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2_c = sum((vi_1 - bi_c).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2_d = sum((vi_1 - bi_d).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2_e = sum((vi_1 - bi_e).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2_f = sum((vi_1 - bi_f).^2 ./ 2 /dev^2) - (vi_1)' * wij_w ./ dev;
+        % Ejf2 = sum([Ejf2_a;Ejf2_b;Ejf2_c;Ejf2_d;Ejf2_e;Ejf2_f]);
+        % Ejf2 = (vi_1)' * wij_w + randi([0, ceil(dev)], 1, nh1) + bi;
+        Ejf2 = sum((vi_1 - bi).^2 ./ 2 ./ dev^2) - (vi_1)' * wij_w ./ dev;
                 % Ejf = (vi_1)' * wij_w;
                 pijf2 = 1 ./ (1 + exp(-Ejf2));
                 hj2 = gt(pijf2, rand(1, nh1))';
@@ -86,84 +92,7 @@ for c = 1:Nbmp
         wij_w = wij_w + etaa .* (Etotij - Etotij2);
 
 
-% %% weight jk
-%         %% 1st froward
-%                 Ejf = (vi_origin)' * wij_w;
-%                 pijf = 1 ./ (1 + exp(-Ejf));
-%                 hj = gt(pijf, rand(1, nh1))';
-%
-%                 Ekf = (hj)' * wjk_w;
-%                 pjkf = 1 ./ (1 + exp(-Ekf));
-%                 hk = gt(pjkf, rand(1, nh2))';   % 500x1
-%                 Etotjk = hj * pjkf;
-%
-%                 Etf  = (hk)' * wkt;       %1x2000
-%                 pktf = 1 ./ (1 + exp(-Etf));
-%                 ht = gt(pktf, rand(1, nt))';
-%         %% 1st backward
-%                 Etr  = (ht)' * (wkt)';
-%                 ptkr = 1 ./ (1 + exp(-Etr));
-%                 hk = gt(ptkr, rand(1, nh2))';
-%
-%                 Ekr  = (hk)' * (wjk_w)';           %
-%                 pkjr = 1 ./ (1 + exp(-Ekr));        %
-%                 hj = gt(pkjr, rand(1, nh1))';
-%
-%                 Ejr  = (hj)' * (wij_w)';           %
-%                 pjir = 1 ./ (1 + exp(-Ejr));        %
-%                 vi_2 = gt(pjir, rand(1, nin))';
-%         %% 2nd forward
-%                 Ejf = (vi_2)' * wij_w;
-%                 pijf = 1 ./ (1 + exp(-Ejf));
-%                 hj = gt(pijf, rand(1, nh1))';
-%
-%                 Ekf = (hj)' * wjk_w;
-%                 pjkf = 1 ./ (1 + exp(-Ekf));
-%                 hk = gt(pjkf, rand(1, nh2))';   % 500x1
-%                 Etotjk2 = hj * pjkf;
-%
-%         wjk_w = wjk_w + etaa .* (Etotjk - Etotjk2);
-% %% weight kt
-%         %% 1st froward
-%                 Ejf = (vi_origin)' * wij_w;
-%                 pijf = 1 ./ (1 + exp(-Ejf));
-%                 hj = gt(pijf, rand(1, nh1))';
-%
-%                 Ekf = (hj)' * wjk_w;
-%                 pjkf = 1 ./ (1 + exp(-Ekf));
-%                 hk = gt(pjkf, rand(1, nh2))';   % 500x1
-%
-%                 Etf  = (hk)' * wkt;       %1x2000
-%                 pktf = 1 ./ (1 + exp(-Etf));
-%                 ht = gt(pktf, rand(1, nt))';
-%                 Etotkt = hk * pktf;
-%         %% 1st backward
-%                 Etr  = (ht)' * (wkt)';
-%                 ptkr = 1 ./ (1 + exp(-Etr));
-%                 hk = gt(ptkr, rand(1, nh2))';
-%
-%                 Ekr  = (hk)' * (wjk_w)';           %
-%                 pkjr = 1 ./ (1 + exp(-Ekr));        %
-%                 hj = gt(pkjr, rand(1, nh1))';
-%
-%                 Ejr  = (hj)' * (wij_w)';           %
-%                 pjir = 1 ./ (1 + exp(-Ejr));        %
-%                 vi_3 = gt(pjir, rand(1, nin))';
-%         %% 2nd forward
-%                 Ejf = (vi_3)' * wij_w;
-%                 pijf = 1 ./ (1 + exp(-Ejf));
-%                 hj = gt(pijf, rand(1, nh1))';
-%
-%                 Ekf = (hj)' * wjk_w;
-%                 pjkf = 1 ./ (1 + exp(-Ekf));
-%                 hk = gt(pjkf, rand(1, nh2))';   % 500x1
-%
-%                 Etf  = (hk)' * wkt;       %1x2000
-%                 pktf = 1 ./ (1 + exp(-Etf));
-%                 ht = gt(pktf, rand(1, nt))';
-%                 Etotkt2 = hk * pktf;
-%
-%         wkt = wkt + etat .*(Etotkt - Etotkt2);
+
 %
 %  %% simple
 %          Ejf = (vi_origin)' * wij_w;
@@ -185,19 +114,7 @@ for c = 1:Nbmp
 %           sdelta = ht * ser;
 %           sw = sw + etas .* sdelta;
 %         end
-%  %% bp
-%         bpdi = zeros(1, 10);
-%         bpdi(digit + 1) = 1;
-%         bpv = (ht)';       % 1x2000
-%         bph = bpv * wi ./nbph;    % 1x50
-%         bphs = sigmoid(bph);
-%         bpy = bphs * wj ./ nd;   %1x10
-%         bper = bpdi - bpy;
-%         bpdelta_i = (bpv)' * (wj * bper' .* dsigmoid(bphs'))';
-%         bpdelta_j = bphs' * bper;
-%
-%         wi = wi + bpdelta_i .* etai;
-%         wj = wj + bpdelta_j .* etaj;
+
 
         if rem(c,(Nbmp/10)) == 0,
             figure(2);title('during train')
@@ -215,21 +132,21 @@ end
 % testresult_s = 0;
 testnum = 10;
 for tc = 1:testnum;
-  ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
-  % ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
+  % ftname = sprintf('~/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
+  ftname = sprintf('/Users/timer/OneDrive/ms1_2/neuralnetwork/final/T%1d.bmp' , tc);
   B = double(imread(ftname));
-  vtt = reshape(B./255, nin, 1);
-  devt = std(vtt);
-  bit = mean(vtt);
-  Ejf = sum((vtt - bi).^2 ./ dev^2) - (vtt)' * wij_w ./ dev;
+  tv = reshape(B./255, nin, 1);
+  tdev = std(tv);
+  tbi = -mean(tv);
+  tEij = (tv)' * wij_w + randi([0, ceil(tdev)], 1, nh1) + tbi;
   % Ejf = (vi_origin)' * wij_w;
-  pijf = 1 ./ (1 + exp(-Ejf));
-  hj = gt(pijf, rand(1, nh1))';
-  Etotij = vtt * pijf;
+  tpij = 1 ./ (1 + exp(-tEij));
+  thj = gt(tpij, rand(1, nh1))';
+  % thj = max(0, tEij)';
 
-  Ejr  = (hj)' * (wij_w)';           %
-  pjir = 1 ./ (1 + exp(-Ejr));        %
-  vti_1 = (pjir)';
+  tEji  = tbi + (thj)' * (wij_w)';           %
+  tpji = 1 ./ (1 + exp(-tEji));        %
+  tvi_1 = (tpji)';
 
 
 %
@@ -244,9 +161,14 @@ for tc = 1:testnum;
 %   % [M, I(1, tc)] = max(out);
   if mod(tc, (testnum / 10)) == 0,
     figure(3)
-    subplot(2, 10, tc / (testnum / 10)); imshow(B, [0 255]);
-    subplot(2, 10, 10 + tc / (testnum / 10)); imshow(reshape((vti_1 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
+    subplot(4, 10, tc / (testnum / 10)); imshow(B, [0 255]);
+    subplot(2, 10, 10 + tc / (testnum / 10)); imshow(reshape((tvi_1 .* 255), sqrt(nin), sqrt(nin)), [0 255]);
   end
+end
+figure(4)
+for cp = 1:50;
+      pic = round(reshape(((wij_w(:,cp)+1).*(255/2)),32,32));
+      subplot(5,10,cp); imshow( pic,[min(min(pic)) max(max(pic))]); hold on;
 end
 % fprintf('accuracy_bp = %2.1f%%\n', accuracy_bp)
 % fprintf('accuracy_s = %2.1f%%\n', accuracy_s)
