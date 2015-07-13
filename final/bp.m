@@ -62,11 +62,11 @@ for c = 1:Nbmp;
   delta_tl = (ht_a)' * er;
   delta_jt_temp = wtl * er' .* dsigmoid(ht_a');  % tx1
   delta_jt = (hj_a)' * (delta_jt_temp)';
-  delta_ij = (vi)' * ((wjt * delta_jt_temp)' .* dsigmoid(hj_a));
+  % delta_ij = (vi)' * ((wjt * delta_jt_temp)' .* dsigmoid(hj_a));
 
   delta_ij = (vi)' * ((wjt * (wtl * er' .* dsigmoid(ht_a')))' .* dsigmoid(hj_a));
 
-delta_ij = (vi)' * sum(er.* ((sum(wjt) .* dsigmoid(ht_a)) * wtl));
+% delta_ij = (vi)' * sum(er.* ((sum(wjt) .* dsigmoid(ht_a)) * wtl));
 
 
   % delta_tl = ht_a * (er)';
